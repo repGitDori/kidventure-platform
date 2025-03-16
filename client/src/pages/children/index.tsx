@@ -9,6 +9,7 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { calculateChildAge } from "@/lib/utils";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 
@@ -96,7 +97,8 @@ const childFormSchema = z.object({
   customField: z.string().optional(),
   customFieldValue: z.string().optional(),
   profileImage: z.string().optional(),
-  notes: z.string().optional()
+  notes: z.string().optional(),
+  parentId: z.number().optional() // For admin reassignment of children
 });
 
 type ChildFormValues = z.infer<typeof childFormSchema>;
@@ -121,6 +123,12 @@ export default function ChildrenPage() {
   const { data: children, isLoading } = useQuery({
     queryKey: ['/api/children'],
     enabled: !!user
+  });
+  
+  // Fetch users for admin capabilities
+  const { data: users } = useQuery({
+    queryKey: ['/api/users'],
+    enabled: !!user && user.role === Role.ADMIN
   });
 
   // Create child mutation
@@ -167,6 +175,29 @@ export default function ChildrenPage() {
       toast({
         title: "Error",
         description: "There was a problem updating the child. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Delete child mutation
+  const deleteChildMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest('DELETE', `/api/children/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/children'] });
+      toast({
+        title: "Child Removed",
+        description: "The child has been successfully removed.",
+      });
+    },
+    onError: (error) => {
+      console.error("Error deleting child:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem removing the child. Please try again.",
         variant: "destructive",
       });
     }
@@ -228,6 +259,19 @@ export default function ChildrenPage() {
       notes: child.notes || ""
     });
     setIsEditDialogOpen(true);
+  };
+  
+  // Handle child deletion
+  const handleDeleteChild = (id: number) => {
+    if (window.confirm("Are you sure you want to remove this child? This action cannot be undone.")) {
+      deleteChildMutation.mutate(id);
+    }
+  };
+  
+  // Handle view details for a child
+  const onViewDetails = (child: any) => {
+    // For now, just open the edit dialog as a view details functionality
+    handleEditClick(child);
   };
 
   // Reset form when add dialog closes
