@@ -196,10 +196,8 @@ export default function RegisterForm() {
         
         <div className="text-center text-sm">
           Already have an account?{" "}
-          <Link href="/login">
-            <a className="text-primary hover:underline font-medium">
-              Log in
-            </a>
+          <Link href="/login" className="text-primary hover:underline font-medium">
+            Log in
           </Link>
         </div>
       </form>

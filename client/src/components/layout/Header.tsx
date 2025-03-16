@@ -52,7 +52,7 @@ export default function Header() {
   const isLandingPage = location === "/";
   
   return (
-    <header className="bg-white shadow-md">
+    <header className="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center">
           <div className="mr-3">
@@ -126,10 +126,10 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link href="/login">
+              <Link href="/login" asChild>
                 <Button variant="outline">Log in</Button>
               </Link>
-              <Link href="/register">
+              <Link href="/register" asChild>
                 <Button>Sign up</Button>
               </Link>
             </>
@@ -215,7 +215,7 @@ export default function Header() {
                   </>
                 ) : (
                   <>
-                    <Link href="/login">
+                    <Link href="/login" asChild>
                       <Button 
                         className="w-full" 
                         variant="outline"
@@ -224,7 +224,7 @@ export default function Header() {
                         Log in
                       </Button>
                     </Link>
-                    <Link href="/register">
+                    <Link href="/register" asChild>
                       <Button 
                         className="w-full"
                         onClick={() => setIsMenuOpen(false)}
