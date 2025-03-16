@@ -13,6 +13,7 @@ import bcrypt from 'bcryptjs';
 
 export interface IStorage {
   // Users
+  getAllUsers(): Promise<User[]>;
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -282,6 +283,10 @@ export class MemStorage implements IStorage {
   }
 
   // Users
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+  
   async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
   }

@@ -869,6 +869,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User management routes
+  app.get('/api/users', hasRole([Role.ADMIN]), async (req, res, next) => {
+    try {
+      const users = await storage.getAllUsers();
+      
+      // Remove passwords from response
+      const sanitizedUsers = users.map(user => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      
+      res.json(sanitizedUsers);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.get('/api/users/:id', isAuthenticated, async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      const user = req.user as any;
+      
+      // Only admins can access any user, others can only access their own
+      if (user.role !== Role.ADMIN && user.id !== id) {
+        return res.status(403).json({ message: 'Not authorized to access this user profile' });
+      }
+      
+      const userProfile = await storage.getUser(id);
+      if (!userProfile) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      // Remove password from response
+      const { password, ...userWithoutPassword } = userProfile;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.patch('/api/users/:id', isAuthenticated, async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      const user = req.user as any;
+      
+      // Only admins can modify any user, others can only modify their own through profile change requests
+      if (user.role !== Role.ADMIN && user.id !== id) {
+        return res.status(403).json({ message: 'Not authorized to modify this user' });
+      }
+      
+      // Admin can directly update users
+      if (user.role === Role.ADMIN) {
+        const updatedUser = await storage.updateUser(id, req.body);
+        if (!updatedUser) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+        
+        // Remove password from response
+        const { password, ...userWithoutPassword } = updatedUser;
+        return res.json(userWithoutPassword);
+      }
+      
+      // Other users must use the profile change request system
+      return res.status(403).json({ 
+        message: 'Regular users must use the profile change request system to update their profiles' 
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
