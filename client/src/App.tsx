@@ -25,7 +25,7 @@ export const UserContext = createContext<{
 }>({
   user: null,
   setUser: () => {},
-  isLoading: true
+  isLoading: false  // Changed to false as the default state
 });
 
 function Router() {
@@ -52,6 +52,7 @@ function Router() {
 // This component must be inside the QueryClientProvider to use useQuery
 function AppContent() {
   const [user, setUser] = useState<any>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   
   const { data, isLoading, isError } = useQuery({
     queryKey: ['/api/auth/me'],
@@ -80,13 +81,16 @@ function AppContent() {
   });
   
   useEffect(() => {
-    if (!isLoading && !isError) {
-      setUser(data);
+    if (!isLoading) {
+      setCheckingAuth(false);
+      if (!isError) {
+        setUser(data);
+      }
     }
   }, [data, isLoading, isError]);
   
   return (
-    <UserContext.Provider value={{ user, setUser, isLoading }}>
+    <UserContext.Provider value={{ user, setUser, isLoading: checkingAuth }}>
       <Router />
       <Toaster />
     </UserContext.Provider>
