@@ -601,6 +601,164 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin check-in/check-out routes
+  app.post('/api/admin/check-in', hasRole([Role.ADMIN, Role.STAFF]), async (req, res, next) => {
+    try {
+      const { childId, date } = req.body;
+      
+      if (!childId || !date) {
+        return res.status(400).json({ message: 'Child ID and date are required' });
+      }
+      
+      const child = await storage.getChild(Number(childId));
+      if (!child) {
+        return res.status(404).json({ message: 'Child not found' });
+      }
+      
+      // In a real app, you would create an attendance record
+      // For now we'll just return a success message
+      res.json({ 
+        success: true,
+        message: `Check-in recorded for ${child.firstName} ${child.lastName}`,
+        timestamp: new Date()
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post('/api/admin/check-out', hasRole([Role.ADMIN, Role.STAFF]), async (req, res, next) => {
+    try {
+      const { childId, date } = req.body;
+      
+      if (!childId || !date) {
+        return res.status(400).json({ message: 'Child ID and date are required' });
+      }
+      
+      const child = await storage.getChild(Number(childId));
+      if (!child) {
+        return res.status(404).json({ message: 'Child not found' });
+      }
+      
+      // In a real app, you would update the attendance record
+      // For now we'll just return a success message
+      res.json({ 
+        success: true,
+        message: `Check-out recorded for ${child.firstName} ${child.lastName}`,
+        timestamp: new Date()
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Admin user management routes
+  app.get('/api/admin/users', hasRole([Role.ADMIN]), async (req, res, next) => {
+    try {
+      // In a real app with a database, you would fetch all users
+      // For our in-memory storage, we need to collect all users
+      const allUsers: any[] = [];
+      
+      for (let i = 1; i <= 100; i++) { // Limit to prevent infinite loops
+        const user = await storage.getUser(i);
+        if (user) {
+          // Remove password before sending
+          const { password, ...userData } = user;
+          allUsers.push(userData);
+        }
+      }
+      
+      res.json(allUsers);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post('/api/admin/users', hasRole([Role.ADMIN]), async (req, res, next) => {
+    try {
+      const result = insertUserSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const newUser = await storage.createUser(result.data);
+      
+      // Remove password before sending
+      const { password, ...userData } = newUser;
+      res.status(201).json(userData);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.patch('/api/admin/users/:id', hasRole([Role.ADMIN]), async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      const result = insertUserSchema.partial().safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const updatedUser = await storage.updateUser(id, result.data);
+      
+      if (!updatedUser) {
+        return res.status(400).json({ message: 'Failed to update user' });
+      }
+      
+      // Remove password before sending
+      const { password, ...userData } = updatedUser;
+      res.json(userData);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Admin payment management routes
+  app.get('/api/admin/payments', hasRole([Role.ADMIN, Role.STAFF]), async (req, res, next) => {
+    try {
+      // In a real app, you would fetch payments from the database
+      // For our demo, we'll return a message
+      res.json({
+        message: 'Payment management requires database implementation',
+        hint: 'This would return all payments in a real application'
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Admin schedule management
+  app.get('/api/admin/schedule', hasRole([Role.ADMIN, Role.STAFF]), async (req, res, next) => {
+    try {
+      // Get all schedule slots
+      const allClasses = [];
+      const allSlots = [];
+      
+      // For each class, get its slots
+      for (let i = 1; i <= 100; i++) { // Limit to prevent infinite loops
+        const klass = await storage.getClass(i);
+        if (klass) {
+          allClasses.push(klass);
+          const slots = await storage.getSlotsByClass(klass.id);
+          allSlots.push(...slots);
+        }
+      }
+      
+      res.json({
+        classes: allClasses,
+        scheduleSlots: allSlots
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -1,0 +1,176 @@
+Admin User (Administrator)
+Client User (Parent)
+Role & Permission Management (Backend):
+
+Use JWT tokens with a Role-based Access Control (RBAC) model:
+admin: Has full control—can manage users, children profiles, payments, check-in/check-out, reports, analytics.
+Client: Limited permissions—view and manage own child profiles, payments, schedule.
+📌 Detailed Technical User Flows & Architecture
+🛠️ 1. Admin User Role & Architecture
+Admin Functionality (Backend API Endpoints):
+/api/admin/check-in (POST):
+
+Verify parent/child check-in time. Mark attendance.
+/api/admin/check-out (POST):
+
+Mark child check-out time, logging attendance.
+/api/admin/users (CRUD endpoints):
+
+Create/update/delete parents & child records.
+/api/admin/payments:
+
+Manage payments. Validate payments made, view outstanding payments, mark payments complete.
+/api/admin/schedule:
+
+View and manage daily, weekly, and monthly schedules.
+Admin Frontend Page (React.js):
+Dashboard Overview:
+Quickly check-ins/check-outs (attendance).
+Payment statuses (due/paid).
+Add new families, children, manage profiles.
+Reports and analytics (basic attendance stats, capacity utilization, upcoming payments).
+👨‍👩‍👧 2. Parent User Role & Frontend Architecture
+A. Frontend Profile Structure for Parents (React Components)
+Parent view would include:
+
+List of Child Profiles (cards):
+
+jsx
+Copy code
+<ChildCard key={childId}>
+  - Child's Name
+  - Short Description
+  - Profile Picture (optional)
+  - Click to expand detailed profile
+</ChildCard>
+"Add New Child" Button at the bottom to trigger modal/form:
+
+jsx
+Copy code
+<AddChildButton />
+Detailed Child Profile View:
+After clicking a child card, the parent sees:
+
+jsx
+Copy code
+<ExpandedChildProfile>
+  - Child’s Picture (optional)
+  - Detailed Description (editable by parent)
+  - Schedule Calendar View (future bookings)
+  - Payment History Section (paid/due)
+  - Contact Info (Admin contact details for queries)
+</ChildProfile>
+Data fetched from API endpoint:
+/api/children/:childId
+/api/bookings/:childId
+/api/payments/:childId
+📱 2. Client (Parent) User Role & Architecture
+Client (Parent) Functionality API endpoints:
+/api/auth/register (Registration & secure QR generation)
+/api/children (POST/GET/PUT) (CRUD operations)
+/api/bookings (CRUD bookings)
+/api/payments (POST, initiate payments—integrate Stripe or PayPal free tier, or manual validation)
+Detailed Client Frontend Structure:
+Parent Dashboard (/dashboard):
+Child profile cards (as described above)
+Button to Add new child (POST /children endpoint)
+Secure file uploads (driver license, encrypted storage)
+Option to scan QR code for quick secure login or security checks
+🔒 Detailed QR Code-based Security (Extra Security Layer)
+Backend QR Token Generation:
+
+Generate secure token:
+javascript
+Copy code
+const crypto = require('crypto');
+
+function generateSecureToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+Store the secure token linked to userId.
+
+Frontend generates QR (using React QR Code):
+
+jsx
+Copy code
+import QRCode from "react-qr-code";
+
+<QRCode value={`https://appdomain.com/auth?userId=${userId}&token=${secureToken}`} />
+Validate token when scanning (backend endpoint checks DB-stored token).
+💾 Database Schema (Free PostgreSQL)
+sql
+Copy code
+Users (Parent/Admin)
+- user_id (PK)
+- email (unique)
+- password_hash (bcrypt)
+- role (parent/admin)
+- qr_token (secure)
+
+Children
+- child_id (PK)
+- user_id (FK: Users)
+- name
+- dob
+- description
+- age_category (infant/toddler/child)
+
+Bookings
+- booking_id (PK)
+- child_id (FK: Children)
+- scheduled_time_start
+- scheduled_duration
+- points_required
+- assigned_employee (FK Employees)
+
+Payments
+- payment_id (PK)
+- user_id (FK: Users)
+- child_id (FK: Children)
+- amount
+- date_paid
+- status (paid/due/pending)
+
+Schedules
+- schedule_id (PK)
+- child_id (FK)
+- employee_id (FK)
+- booking_datetime
+
+Employees
+- employee_id (PK)
+- name
+- max_capacity_points_per_hour
+
+Assignments
+- assignment_id (PK)
+- booking_id (FK)
+- employee_id (FK)
+- points_allocated
+🔒 Security Enhancements (Entirely Free):
+QR-Based Extra Security
+
+Each parent receives unique generated tokens, represented in QR codes.
+Scanning QR code verifies identity, authenticates parent securely.
+Encrypted Storage (Sensitive data: driver's license)
+
+Use Node.js crypto module or Python cryptography module.
+Store encrypted data in PostgreSQL securely.
+🛠️ 100% Free Tools Recommended Summary
+Tech Area	Free Tools
+Frontend	React.js, Tailwind CSS, Zustand, Redux Toolkit
+Backend Framework	Node.js + Express.js OR Python + FastAPI
+Database	PostgreSQL with pgAdmin
+Authentication & Security	JWT, bcrypt, crypto, Let’s Encrypt SSL
+QR Generation & Scan	react-qr-code, react-qr-reader (both free)
+Frontend Hosting	Vercel, GitHub Pages, Netlify (free tiers)
+Backend & Database Hosting	Render, Railway.app, Fly.io (free tier)
+Version Control & CI	GitHub & GitHub Actions (free)
+Monitoring/Logging	Prometheus, Grafana, Sentry (free tiers)
+✅ Immediate Next Steps (Guidance):
+Set up PostgreSQL database with free pgAdmin management.
+Build authentication (JWT, bcrypt hashing).
+Implement secure QR tokens (crypto-based).
+Develop backend endpoints for admin/parent roles clearly.
+Build responsive frontend using React and Tailwind CSS.
+Deploy frontend/backend using free hosting (Render, Railway, Vercel).
