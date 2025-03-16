@@ -45,8 +45,18 @@ export default function QRScanner() {
         description: 'Welcome back to Kid-Venture!',
       });
       
-      // Redirect to dashboard
-      setLocation('/dashboard');
+      // Redirect based on user role
+      if (userData.role === 'admin') {
+        setLocation("/dashboard/admin");
+      } else if (userData.role === 'staff') {
+        setLocation("/dashboard/staff");
+      } else if (userData.role === 'parent') {
+        // Send parents to the children management page where they can see their children
+        setLocation("/children");
+      } else {
+        // Default fallback
+        setLocation("/dashboard");
+      }
     } catch (error) {
       console.error('QR login error:', error);
       setErrorMessage('Authentication failed. Please try again.');
