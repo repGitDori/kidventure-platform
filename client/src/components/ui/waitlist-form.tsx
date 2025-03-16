@@ -1,0 +1,264 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { WaitlistFormData } from "@/lib/types";
+
+const waitlistSchema = z.object({
+  firstName: z.string().min(2, { message: "First name is required" }),
+  lastName: z.string().min(2, { message: "Last name is required" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  role: z.string({ required_error: "Please select a role" }),
+  interests: z.array(z.string()).min(1, { message: "Select at least one interest" }),
+  newsletter: z.boolean().default(false),
+});
+
+export default function WaitlistForm() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  
+  const form = useForm<WaitlistFormData>({
+    resolver: zodResolver(waitlistSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      role: "",
+      interests: [],
+      newsletter: false,
+    },
+  });
+  
+  const onSubmit = async (data: WaitlistFormData) => {
+    setIsSubmitting(true);
+    
+    try {
+      await apiRequest('POST', '/api/waitlist', data);
+      
+      toast({
+        title: "Thanks for joining our waitlist!",
+        description: "We'll be in touch soon with more information.",
+      });
+      
+      form.reset();
+    } catch (error) {
+      console.error("Error submitting waitlist form:", error);
+      
+      toast({
+        title: "Submission failed",
+        description: "There was a problem adding you to the waitlist. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  const interestOptions = [
+    { id: "learning", label: "Educational Resources" },
+    { id: "classes", label: "Classes & Activities" },
+    { id: "tracking", label: "Progress Tracking" },
+    { id: "community", label: "Community Features" },
+  ];
+  
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="firstName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>First Name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Your first name"
+                    {...field}
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Last Name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Your last name"
+                    {...field}
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email Address</FormLabel>
+              <FormControl>
+                <Input
+                  type="email"
+                  placeholder="your.email@example.com"
+                  {...field}
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="role"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>I am a...</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={isSubmitting}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your role" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="parent">Parent</SelectItem>
+                  <SelectItem value="teacher">Teacher/Educator</SelectItem>
+                  <SelectItem value="school">School Administrator</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="interests"
+          render={() => (
+            <FormItem>
+              <div className="mb-4">
+                <FormLabel>I'm interested in (select all that apply)</FormLabel>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {interestOptions.map((option) => (
+                  <FormField
+                    key={option.id}
+                    control={form.control}
+                    name="interests"
+                    render={({ field }) => {
+                      return (
+                        <FormItem
+                          key={option.id}
+                          className="flex flex-row items-start space-x-3 space-y-0"
+                        >
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value?.includes(option.id)}
+                              onCheckedChange={(checked) => {
+                                return checked
+                                  ? field.onChange([...field.value, option.id])
+                                  : field.onChange(
+                                      field.value?.filter(
+                                        (value) => value !== option.id
+                                      )
+                                    );
+                              }}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          <FormLabel className="font-normal cursor-pointer">
+                            {option.label}
+                          </FormLabel>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                ))}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="newsletter"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel className="font-normal">
+                  I'd like to receive updates about KidVenture's launch and educational resources.
+                </FormLabel>
+              </div>
+            </FormItem>
+          )}
+        />
+        
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Processing..." : "Join the Waitlist"}
+        </Button>
+        
+        <p className="text-center text-xs text-gray-500 mt-3">
+          By joining, you agree to our{" "}
+          <a href="#" className="text-primary hover:underline">
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a href="#" className="text-primary hover:underline">
+            Privacy Policy
+          </a>
+          .
+        </p>
+      </form>
+    </Form>
+  );
+}

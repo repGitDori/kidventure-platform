@@ -1,0 +1,521 @@
+import type { Express, Request, Response, NextFunction } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import session from "express-session";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import bcrypt from "bcryptjs";
+import MemoryStore from "memorystore";
+import { 
+  insertUserSchema, insertBranchSchema, insertChildSchema, 
+  insertClassSchema, insertScheduleSlotSchema, insertAppointmentSchema,
+  insertResourceSchema, insertWaitlistSchema, insertContactMessageSchema,
+  loginSchema, Role
+} from "@shared/schema";
+import { z } from "zod";
+
+const SessionStore = MemoryStore(session);
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up session and authentication
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'kidventure-secret',
+    resave: false,
+    saveUninitialized: false,
+    store: new SessionStore({
+      checkPeriod: 86400000 // 24 hours
+    }),
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      secure: process.env.NODE_ENV === 'production'
+    }
+  }));
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  // Configure passport
+  passport.use(new LocalStrategy(
+    { usernameField: 'email' },
+    async (email, password, done) => {
+      try {
+        const user = await storage.getUserByEmail(email);
+        if (!user) {
+          return done(null, false, { message: 'Invalid email or password' });
+        }
+        
+        const isPasswordValid = await storage.verifyPassword(password, user.password);
+        if (!isPasswordValid) {
+          return done(null, false, { message: 'Invalid email or password' });
+        }
+        
+        return done(null, user);
+      } catch (error) {
+        return done(error);
+      }
+    }
+  ));
+
+  passport.serializeUser((user: any, done) => {
+    done(null, user.id);
+  });
+
+  passport.deserializeUser(async (id: number, done) => {
+    try {
+      const user = await storage.getUser(id);
+      done(null, user);
+    } catch (error) {
+      done(error);
+    }
+  });
+
+  // Middleware to check authentication
+  const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.status(401).json({ message: 'Unauthorized' });
+  };
+
+  // Middleware to check role
+  const hasRole = (roles: Role[]) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      
+      const user = req.user as any;
+      if (!roles.includes(user.role)) {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
+      
+      next();
+    };
+  };
+
+  // Authentication routes
+  app.post('/api/auth/login', (req, res, next) => {
+    try {
+      const result = loginSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      passport.authenticate('local', (err: any, user: any, info: any) => {
+        if (err) {
+          return next(err);
+        }
+        if (!user) {
+          return res.status(401).json({ message: info.message || 'Authentication failed' });
+        }
+        
+        req.logIn(user, (err) => {
+          if (err) {
+            return next(err);
+          }
+          
+          // Remove password from response
+          const { password, ...userResponse } = user;
+          return res.json(userResponse);
+        });
+      })(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post('/api/auth/register', async (req, res, next) => {
+    try {
+      const userSchema = insertUserSchema.extend({
+        confirmPassword: z.string()
+      }).refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords don't match",
+        path: ["confirmPassword"],
+      });
+      
+      const result = userSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const { confirmPassword, ...userData } = result.data;
+      
+      // Check if email already exists
+      const existingUser = await storage.getUserByEmail(userData.email);
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email already in use' });
+      }
+      
+      // Hash password
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      
+      // Create user with parent role by default
+      const newUser = await storage.createUser({
+        ...userData,
+        password: hashedPassword,
+        role: Role.PARENT
+      });
+      
+      // Login the new user
+      req.logIn(newUser, (err) => {
+        if (err) {
+          return next(err);
+        }
+        
+        // Remove password from response
+        const { password, ...userResponse } = newUser;
+        return res.status(201).json(userResponse);
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post('/api/auth/logout', (req, res) => {
+    req.logout(() => {
+      res.status(200).json({ message: 'Logged out successfully' });
+    });
+  });
+
+  app.get('/api/auth/me', isAuthenticated, (req, res) => {
+    const user = req.user as any;
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    // Remove password from response
+    const { password, ...userResponse } = user;
+    res.json(userResponse);
+  });
+
+  // Branch routes
+  app.get('/api/branches', async (_req, res, next) => {
+    try {
+      const branches = await storage.getAllBranches();
+      res.json(branches);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get('/api/branches/:id', async (req, res, next) => {
+    try {
+      const branch = await storage.getBranch(Number(req.params.id));
+      if (!branch) {
+        return res.status(404).json({ message: 'Branch not found' });
+      }
+      res.json(branch);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post('/api/branches', hasRole([Role.ADMIN]), async (req, res, next) => {
+    try {
+      const result = insertBranchSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const branch = await storage.createBranch(result.data);
+      res.status(201).json(branch);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.patch('/api/branches/:id', hasRole([Role.ADMIN]), async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      const branch = await storage.getBranch(id);
+      if (!branch) {
+        return res.status(404).json({ message: 'Branch not found' });
+      }
+      
+      const result = insertBranchSchema.partial().safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const updatedBranch = await storage.updateBranch(id, result.data);
+      res.json(updatedBranch);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Children routes
+  app.get('/api/children', isAuthenticated, async (req, res, next) => {
+    try {
+      const user = req.user as any;
+      if (user.role === Role.PARENT) {
+        const children = await storage.getChildrenByParent(user.id);
+        return res.json(children);
+      } else {
+        // Admin and staff can see all children for now
+        // In a real app, you might want to filter by branch for staff
+        const allChildren: any[] = [];
+        for (let i = 1; i < storage.userId; i++) {
+          const parentUser = await storage.getUser(i);
+          if (parentUser && parentUser.role === Role.PARENT) {
+            const children = await storage.getChildrenByParent(i);
+            allChildren.push(...children);
+          }
+        }
+        return res.json(allChildren);
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post('/api/children', hasRole([Role.PARENT]), async (req, res, next) => {
+    try {
+      const user = req.user as any;
+      
+      const result = insertChildSchema.safeParse({
+        ...req.body,
+        parentId: user.id
+      });
+      
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const child = await storage.createChild(result.data);
+      res.status(201).json(child);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Classes routes
+  app.get('/api/branches/:branchId/classes', async (req, res, next) => {
+    try {
+      const branchId = Number(req.params.branchId);
+      const branch = await storage.getBranch(branchId);
+      if (!branch) {
+        return res.status(404).json({ message: 'Branch not found' });
+      }
+      
+      const classes = await storage.getClassesByBranch(branchId);
+      res.json(classes);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post('/api/classes', hasRole([Role.ADMIN, Role.STAFF]), async (req, res, next) => {
+    try {
+      const result = insertClassSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const klass = await storage.createClass(result.data);
+      res.status(201).json(klass);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Schedule slots routes
+  app.get('/api/classes/:classId/slots', async (req, res, next) => {
+    try {
+      const classId = Number(req.params.classId);
+      const klass = await storage.getClass(classId);
+      if (!klass) {
+        return res.status(404).json({ message: 'Class not found' });
+      }
+      
+      const slots = await storage.getSlotsByClass(classId);
+      res.json(slots);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post('/api/slots', hasRole([Role.ADMIN, Role.STAFF]), async (req, res, next) => {
+    try {
+      const result = insertScheduleSlotSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const slot = await storage.createSlot(result.data);
+      res.status(201).json(slot);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Appointments routes
+  app.get('/api/children/:childId/appointments', hasRole([Role.PARENT, Role.STAFF, Role.ADMIN]), async (req, res, next) => {
+    try {
+      const childId = Number(req.params.childId);
+      const user = req.user as any;
+      
+      // If parent, verify they are the parent of this child
+      if (user.role === Role.PARENT) {
+        const child = await storage.getChild(childId);
+        if (!child || child.parentId !== user.id) {
+          return res.status(403).json({ message: 'You are not authorized to access this child\'s appointments' });
+        }
+      }
+      
+      const appointments = await storage.getAppointmentsByChild(childId);
+      res.json(appointments);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post('/api/appointments', hasRole([Role.PARENT, Role.STAFF, Role.ADMIN]), async (req, res, next) => {
+    try {
+      const result = insertAppointmentSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const user = req.user as any;
+      if (user.role === Role.PARENT) {
+        // Verify parent owns the child
+        const child = await storage.getChild(result.data.childId);
+        if (!child || child.parentId !== user.id) {
+          return res.status(403).json({ message: 'You are not authorized to book appointments for this child' });
+        }
+      }
+      
+      // Check if slot exists
+      const slot = await storage.getSlot(result.data.slotId);
+      if (!slot) {
+        return res.status(404).json({ message: 'Schedule slot not found' });
+      }
+      
+      // Check for duplicate appointment
+      const existingAppointments = await storage.getAppointmentsBySlot(result.data.slotId, new Date(result.data.date));
+      if (existingAppointments.some(a => a.childId === result.data.childId)) {
+        return res.status(400).json({ message: 'Child already has an appointment for this slot on this date' });
+      }
+      
+      const appointment = await storage.createAppointment(result.data);
+      res.status(201).json(appointment);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Resources routes
+  app.get('/api/resources', async (req, res, next) => {
+    try {
+      const limit = req.query.limit ? Number(req.query.limit) : undefined;
+      const category = req.query.category as string | undefined;
+      
+      if (category) {
+        const resources = await storage.getResourcesByCategory(category);
+        return res.json(resources);
+      }
+      
+      const resources = await storage.getAllResources(limit);
+      res.json(resources);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get('/api/resources/:id', async (req, res, next) => {
+    try {
+      const resource = await storage.getResource(Number(req.params.id));
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post('/api/resources', hasRole([Role.ADMIN, Role.STAFF]), async (req, res, next) => {
+    try {
+      const user = req.user as any;
+      
+      const result = insertResourceSchema.safeParse({
+        ...req.body,
+        createdById: user.id
+      });
+      
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const resource = await storage.createResource(result.data);
+      res.status(201).json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Waitlist route
+  app.post('/api/waitlist', async (req, res, next) => {
+    try {
+      const result = insertWaitlistSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const waitlistEntry = await storage.addToWaitlist(result.data);
+      res.status(201).json(waitlistEntry);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Contact route
+  app.post('/api/contact', async (req, res, next) => {
+    try {
+      const result = insertContactMessageSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const message = await storage.createContactMessage(result.data);
+      res.status(201).json(message);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Admin routes
+  app.get('/api/admin/waitlist', hasRole([Role.ADMIN]), async (_req, res, next) => {
+    try {
+      const entries = await storage.getWaitlistEntries();
+      res.json(entries);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get('/api/admin/messages', hasRole([Role.ADMIN]), async (_req, res, next) => {
+    try {
+      const messages = await storage.getContactMessages();
+      res.json(messages);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.patch('/api/admin/messages/:id/read', hasRole([Role.ADMIN]), async (req, res, next) => {
+    try {
+      const message = await storage.markContactMessageAsRead(Number(req.params.id));
+      if (!message) {
+        return res.status(404).json({ message: 'Message not found' });
+      }
+      res.json(message);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}
