@@ -114,11 +114,22 @@ export default function Header() {
         <div className="hidden md:flex items-center space-x-4">
           {user ? (
             <>
-              <span className="text-sm text-gray-600">
-                Hello, {user.firstName}
-              </span>
+              <div className="flex items-center gap-3">
+                <div className="bg-primary text-white rounded-full h-10 w-10 flex items-center justify-center font-semibold">
+                  {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">
+                    {user.firstName} {user.lastName}
+                  </span>
+                  <span className="text-xs text-gray-500 capitalize">
+                    {user.role}
+                  </span>
+                </div>
+              </div>
+              <div className="border-l border-gray-300 h-8 mx-2"></div>
               <Link href="/profile" className="text-gray-700 hover:text-primary transition-colors">
-                Profile
+                My Profile
               </Link>
               <Button 
                 variant="outline" 
@@ -202,15 +213,30 @@ export default function Header() {
               <div className="mt-auto pb-8 space-y-4">
                 {user ? (
                   <>
-                    <div className="text-sm text-gray-600 px-3">
-                      Logged in as {user.firstName} {user.lastName}
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-primary text-white rounded-full h-10 w-10 flex items-center justify-center font-semibold">
+                          {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">
+                            {user.firstName} {user.lastName}
+                          </span>
+                          <span className="text-xs text-gray-500 capitalize">
+                            {user.role}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                     <Link 
                       href="/profile"
-                      className="px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-colors"
+                      className="px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-colors flex items-center"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Profile
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      My Profile
                     </Link>
                     <Button 
                       className="w-full" 
