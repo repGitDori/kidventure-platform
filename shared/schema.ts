@@ -18,10 +18,18 @@ export const users = pgTable("users", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   role: text("role", { enum: Object.values(Role) }).notNull().default(Role.PARENT),
+  profileImage: text("profile_image"),
+  description: text("description"),
+  securityQuestion1: text("security_question_1"),
+  securityAnswer1: text("security_answer_1"),
+  securityQuestion2: text("security_question_2"),
+  securityAnswer2: text("security_answer_2"),
   secureToken: text("secure_token"),
   driverLicense: text("driver_license"),
   qrEnabled: boolean("qr_enabled").default(false),
   createdAt: timestamp("created_at").defaultNow(),
+  lastModifiedBy: integer("last_modified_by").references(() => users.id),
+  lastModifiedAt: timestamp("last_modified_at"),
 });
 
 // Branches table
@@ -56,8 +64,15 @@ export const children = pgTable("children", {
   lastName: text("last_name").notNull(), 
   dateOfBirth: timestamp("date_of_birth").notNull(),
   parentId: integer("parent_id").notNull().references(() => users.id),
+  profileImage: text("profile_image"),
+  eyeColor: text("eye_color"),
+  hairColor: text("hair_color"),
+  customField: text("custom_field"),
+  customFieldValue: text("custom_field_value"),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
+  lastModifiedBy: integer("last_modified_by").references(() => users.id),
+  lastModifiedAt: timestamp("last_modified_at"),
 });
 
 // Child enrollment in branches
