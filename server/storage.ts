@@ -15,6 +15,8 @@ export interface IStorage {
   // Users
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByIdentifier(identifier: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, data: Partial<User>): Promise<User | undefined>;
   
@@ -118,6 +120,7 @@ export class MemStorage implements IStorage {
     
     // Create admin user (Dorian with password 'cangetin')
     this.createUser({
+      username: 'dorian',
       email: 'dorian@kidventure.com',
       password: bcrypt.hashSync('cangetin', 10),
       firstName: 'Dorian',
@@ -127,6 +130,7 @@ export class MemStorage implements IStorage {
     
     // Create customer user (Sarah with password 'cangetin')
     this.createUser({
+      username: 'sarah',
       email: 'sarah@kidventure.com',
       password: bcrypt.hashSync('cangetin', 10),
       firstName: 'Sarah',
@@ -136,6 +140,7 @@ export class MemStorage implements IStorage {
     
     // Create additional staff user for demo purposes
     this.createUser({
+      username: 'staff',
       email: 'staff@kidventure.com',
       password: bcrypt.hashSync('password123', 10),
       firstName: 'Staff',
@@ -271,6 +276,19 @@ export class MemStorage implements IStorage {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(user => user.email === email);
+  }
+  
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => user.username === username);
+  }
+  
+  async getUserByIdentifier(identifier: string): Promise<User | undefined> {
+    // First try to find by username
+    let user = await this.getUserByUsername(identifier);
+    if (user) return user;
+    
+    // Then try to find by email
+    return await this.getUserByEmail(identifier);
   }
 
   async createUser(user: InsertUser): Promise<User> {

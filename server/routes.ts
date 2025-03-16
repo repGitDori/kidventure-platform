@@ -36,17 +36,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Configure passport
   passport.use(new LocalStrategy(
-    { usernameField: 'email' },
-    async (email, password, done) => {
+    { usernameField: 'identifier' },
+    async (identifier, password, done) => {
       try {
-        const user = await storage.getUserByEmail(email);
+        const user = await storage.getUserByIdentifier(identifier);
         if (!user) {
-          return done(null, false, { message: 'Invalid email or password' });
+          return done(null, false, { message: 'Invalid username/email or password' });
         }
         
         const isPasswordValid = await storage.verifyPassword(password, user.password);
         if (!isPasswordValid) {
-          return done(null, false, { message: 'Invalid email or password' });
+          return done(null, false, { message: 'Invalid username/email or password' });
         }
         
         return done(null, user);
@@ -140,10 +140,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { confirmPassword, ...userData } = result.data;
       
-      // Check if email already exists
-      const existingUser = await storage.getUserByEmail(userData.email);
-      if (existingUser) {
-        return res.status(400).json({ message: 'Email already in use' });
+      // Check if username already exists
+      const existingUsername = await storage.getUserByUsername(userData.username);
+      if (existingUsername) {
+        return res.status(400).json({ message: 'Username already in use' });
+      }
+      
+      // Check if email already exists (if provided)
+      if (userData.email) {
+        const existingEmail = await storage.getUserByEmail(userData.email);
+        if (existingEmail) {
+          return res.status(400).json({ message: 'Email already in use' });
+        }
       }
       
       // Hash password
