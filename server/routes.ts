@@ -10,7 +10,7 @@ import {
   insertUserSchema, insertBranchSchema, insertChildSchema, 
   insertClassSchema, insertScheduleSlotSchema, insertAppointmentSchema,
   insertResourceSchema, insertWaitlistSchema, insertContactMessageSchema,
-  loginSchema, Role
+  insertProfileChangeRequestSchema, loginSchema, Role
 } from "@shared/schema";
 import { z } from "zod";
 

@@ -1,13 +1,13 @@
 import {
   users, branches, staffBranches, children, enrollments,
   classes, scheduleSlots, appointments, resources, waitlist,
-  contactMessages, type User, type InsertUser, type Branch, 
+  contactMessages, profileChangeRequests, type User, type InsertUser, type Branch, 
   type InsertBranch, type StaffBranch, type InsertStaffBranch,
   type Child, type InsertChild, type Enrollment, type InsertEnrollment,
   type Class, type InsertClass, type ScheduleSlot, type InsertScheduleSlot,
   type Appointment, type InsertAppointment, type Resource, type InsertResource,
   type Waitlist, type InsertWaitlist, type ContactMessage, type InsertContactMessage,
-  Role
+  type ProfileChangeRequest, type InsertProfileChangeRequest, Role
 } from "@shared/schema";
 import bcrypt from 'bcryptjs';
 
@@ -78,6 +78,15 @@ export interface IStorage {
   createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
   getContactMessages(): Promise<ContactMessage[]>;
   markContactMessageAsRead(id: number): Promise<ContactMessage | undefined>;
+  
+  // Profile change requests
+  createProfileChangeRequest(request: InsertProfileChangeRequest): Promise<ProfileChangeRequest>;
+  getProfileChangeRequestsByUser(userId: number): Promise<ProfileChangeRequest[]>;
+  getProfileChangeRequestById(id: number): Promise<ProfileChangeRequest | undefined>;
+  getPendingProfileChangeRequests(): Promise<ProfileChangeRequest[]>;
+  updateProfileChangeRequest(id: number, data: Partial<ProfileChangeRequest>): Promise<ProfileChangeRequest | undefined>;
+  approveProfileChangeRequest(id: number, adminId: number, notes?: string): Promise<ProfileChangeRequest | undefined>;
+  rejectProfileChangeRequest(id: number, adminId: number, notes?: string): Promise<ProfileChangeRequest | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -92,6 +101,7 @@ export class MemStorage implements IStorage {
   private resources: Map<number, Resource>;
   private waitlistEntries: Map<number, Waitlist>;
   private contactMessages: Map<number, ContactMessage>;
+  private profileChangeRequests: Map<number, ProfileChangeRequest>;
   
   private userId = 1;
   private branchId = 1;
@@ -104,6 +114,7 @@ export class MemStorage implements IStorage {
   private resourceId = 1;
   private waitlistId = 1;
   private messageId = 1;
+  private changeRequestId = 1;
 
   constructor() {
     this.users = new Map();
@@ -117,6 +128,7 @@ export class MemStorage implements IStorage {
     this.resources = new Map();
     this.waitlistEntries = new Map();
     this.contactMessages = new Map();
+    this.profileChangeRequests = new Map();
     
     // Create admin user (Dorian with password 'cangetin')
     this.createUser({
@@ -547,6 +559,91 @@ export class MemStorage implements IStorage {
     const updatedMessage = { ...message, isRead: true };
     this.contactMessages.set(id, updatedMessage);
     return updatedMessage;
+  }
+
+  // Profile change requests
+  async createProfileChangeRequest(request: InsertProfileChangeRequest): Promise<ProfileChangeRequest> {
+    const id = this.changeRequestId++;
+    const now = new Date();
+    const newRequest: ProfileChangeRequest = {
+      ...request,
+      id,
+      createdAt: now,
+      status: 'pending', // Default status is pending
+      updatedAt: null,
+    };
+    this.profileChangeRequests.set(id, newRequest);
+    return newRequest;
+  }
+
+  async getProfileChangeRequestsByUser(userId: number): Promise<ProfileChangeRequest[]> {
+    return Array.from(this.profileChangeRequests.values())
+      .filter(request => request.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getProfileChangeRequestById(id: number): Promise<ProfileChangeRequest | undefined> {
+    return this.profileChangeRequests.get(id);
+  }
+
+  async getPendingProfileChangeRequests(): Promise<ProfileChangeRequest[]> {
+    return Array.from(this.profileChangeRequests.values())
+      .filter(request => request.status === 'pending')
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async updateProfileChangeRequest(id: number, data: Partial<ProfileChangeRequest>): Promise<ProfileChangeRequest | undefined> {
+    const request = this.profileChangeRequests.get(id);
+    if (!request) return undefined;
+    
+    const updatedRequest = { 
+      ...request, 
+      ...data,
+      updatedAt: new Date() 
+    };
+    this.profileChangeRequests.set(id, updatedRequest);
+    return updatedRequest;
+  }
+
+  async approveProfileChangeRequest(id: number, adminId: number, notes?: string): Promise<ProfileChangeRequest | undefined> {
+    const request = this.profileChangeRequests.get(id);
+    if (!request) return undefined;
+    
+    // Update the request status
+    const updatedRequest = { 
+      ...request, 
+      status: 'approved',
+      adminId,
+      adminNotes: notes || null,
+      updatedAt: new Date() 
+    };
+    this.profileChangeRequests.set(id, updatedRequest);
+    
+    // Apply the changes to the user profile
+    if (request.userId) {
+      const user = this.users.get(request.userId);
+      if (user) {
+        const requestData = request.requestData as Partial<User>;
+        await this.updateUser(request.userId, requestData);
+      }
+    }
+    
+    return updatedRequest;
+  }
+
+  async rejectProfileChangeRequest(id: number, adminId: number, notes?: string): Promise<ProfileChangeRequest | undefined> {
+    const request = this.profileChangeRequests.get(id);
+    if (!request) return undefined;
+    
+    const updatedRequest = {
+      ...request,
+      status: 'rejected',
+      adminId,
+      adminNotes: notes || null,
+      updatedAt: new Date()
+    };
+    this.profileChangeRequests.set(id, updatedRequest);
+    return updatedRequest;
   }
 }
 
