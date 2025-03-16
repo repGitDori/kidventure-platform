@@ -16,7 +16,15 @@ import SchedulePage from "@/pages/schedule";
 import ResourcesPage from "@/pages/resources";
 import { useEffect, useState, createContext } from "react";
 
-export const UserContext = createContext<any>(null);
+export const UserContext = createContext<{
+  user: any;
+  setUser: (user: any) => void;
+  isLoading: boolean;
+}>({
+  user: null,
+  setUser: () => {},
+  isLoading: true
+});
 
 function Router() {
   return (
