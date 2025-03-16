@@ -35,7 +35,11 @@ export default function StaffDashboard() {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Staff Dashboard</h1>
           <p className="text-gray-600">
-            Welcome back, {user?.firstName}! Here's your overview for today.
+            Welcome back, {user?.firstName}! 
+            <span className="font-medium ml-1">(@{user?.username})</span>
+          </p>
+          <p className="text-sm text-gray-500">
+            Here's your overview for today.
           </p>
         </div>
         <BranchSelector onBranchChange={setSelectedBranchId} initialBranchId={selectedBranchId} />

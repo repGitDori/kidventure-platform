@@ -51,7 +51,11 @@ export default function AdminDashboard() {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
           <p className="text-gray-600">
-            Welcome back, {user?.firstName}! Here's an overview of the system.
+            Welcome back, {user?.firstName}! 
+            <span className="font-medium ml-1">(@{user?.username})</span>
+          </p>
+          <p className="text-sm text-gray-500">
+            Here's an overview of the system.
           </p>
         </div>
         <BranchSelector onBranchChange={() => {}} />
