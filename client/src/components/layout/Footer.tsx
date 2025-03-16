@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Smile, Twitter, Youtube, Facebook, Instagram } from "lucide-react";
+import { Twitter, Youtube, Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -53,11 +53,19 @@ export default function Footer() {
             <div className="flex items-center mb-4">
               <div className="mr-3">
                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                  <Smile className="h-6 w-6 text-primary" />
+                  <svg viewBox="0 0 24 24" className="h-6 w-6 text-primary" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path 
+                      d="M6 14c0-3.5 2.5-6.5 6-6.5s6 3 6 6.5M8 15c-1.5 0-2.25 0.5-3 2c0.75-0.5 1.5-0.5 3 0c1.5 0.5 3 0.5 4.5 0c1.5-0.5 2.25-0.5 3 0c-0.75-1.5-1.5-2-3-2M7 10l-1.5-1M17 10l1.5-1M9 8.5l1 1M15 8.5l-1 1" 
+                      stroke="currentColor" 
+                      strokeWidth="1.5" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </div>
               </div>
               <div>
-                <h3 className="font-bold text-xl">KidVenture</h3>
+                <h3 className="font-bold text-xl">Kid-Venture</h3>
                 <p className="text-xs text-gray-400">Learning made fun</p>
               </div>
             </div>
@@ -122,7 +130,7 @@ export default function Footer() {
         
         <div className="border-t border-gray-700 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm mb-4 md:mb-0">
-            &copy; {new Date().getFullYear()} KidVenture Learning. All rights reserved.
+            &copy; {new Date().getFullYear()} Kid-Venture Learning. All rights reserved.
           </p>
           <div className="flex space-x-4">
             <a href="#" className="text-gray-400 hover:text-white transition-colors">
