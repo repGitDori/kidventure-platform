@@ -71,7 +71,7 @@ export default function RegisterForm() {
       
       toast({
         title: "Registration failed",
-        description: "There was an error creating your account. The email might already be in use.",
+        description: "There was an error creating your account. The username or email might already be in use.",
         variant: "destructive",
       });
     } finally {
