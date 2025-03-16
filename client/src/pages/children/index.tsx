@@ -74,6 +74,11 @@ const childFormSchema = z.object({
     const today = new Date();
     return dateObj <= today && dateObj >= new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
   }, { message: "Date of birth must be valid and not in the future or more than 18 years ago." }),
+  eyeColor: z.string().optional(),
+  hairColor: z.string().optional(),
+  customField: z.string().optional(),
+  customFieldValue: z.string().optional(),
+  profileImage: z.string().optional(),
   notes: z.string().optional()
 });
 
