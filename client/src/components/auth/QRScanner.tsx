@@ -65,49 +65,59 @@ export default function QRScanner() {
   };
 
   const startScanner = async () => {
-    setErrorMessage('');
-    setScanning(true);
-    
     try {
-      if (!containerRef.current) return;
+      setErrorMessage('');
+      
+      if (!containerRef.current) {
+        return;
+      }
       
       const html5QrCode = new Html5Qrcode('qr-reader');
       scannerRef.current = html5QrCode;
       
+      // Configure camera
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+      };
+      
       await html5QrCode.start(
-        { facingMode: 'environment' }, // Use the back camera
-        {
-          fps: 10,
-          qrbox: 250,
-        },
+        { facingMode: 'environment' }, // Use rear camera
+        config,
         handleQrCodeSuccess,
         handleQrCodeFailure
       );
-    } catch (err) {
-      console.error('Error starting scanner:', err);
-      setErrorMessage('Could not access camera. Please ensure you have given permission to use the camera.');
-      setScanning(false);
+      
+      setScanning(true);
+    } catch (error) {
+      console.error('Error starting scanner:', error);
+      setErrorMessage('Camera access denied or not available. Please check your device permissions.');
+      
+      toast({
+        title: 'Camera Error',
+        description: 'Unable to access your camera. Please check your permissions.',
+        variant: 'destructive',
+      });
     }
   };
 
   const stopScanner = async () => {
-    if (scannerRef.current) {
-      try {
+    try {
+      if (scannerRef.current) {
         await scannerRef.current.stop();
-      } catch (err) {
-        console.error('Error stopping scanner:', err);
+        scannerRef.current = null;
+        setScanning(false);
       }
+    } catch (error) {
+      console.error('Error stopping scanner:', error);
     }
-    setScanning(false);
   };
 
+  // Clean up scanner on component unmount
   useEffect(() => {
-    // Cleanup on component unmount
     return () => {
       if (scannerRef.current) {
-        scannerRef.current.stop().catch(err => {
-          console.error('Error stopping scanner on unmount:', err);
-        });
+        scannerRef.current.stop().catch(console.error);
       }
     };
   }, []);

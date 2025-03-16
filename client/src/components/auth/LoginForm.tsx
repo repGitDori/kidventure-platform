@@ -125,11 +125,24 @@ export default function LoginForm() {
           )}
         </Button>
         
-        <div className="text-center text-sm">
-          Don't have an account?{" "}
-          <Link href="/register" className="text-primary hover:underline font-medium">
-            Sign up
-          </Link>
+        <div className="text-center text-sm space-y-2">
+          <div>
+            Don't have an account?{" "}
+            <Link href="/register" className="text-primary hover:underline font-medium">
+              Sign up
+            </Link>
+          </div>
+          <div>
+            <Link href="/qr-login" className="text-primary hover:underline font-medium flex items-center justify-center">
+              <svg className="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3h7v7H3V3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M14 3h7v7h-7V3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M3 14h7v7H3v-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M14 14v3M14 20v1M17 14v7M20 14v1M20 18v3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Login with QR Code
+            </Link>
+          </div>
         </div>
       </form>
     </Form>

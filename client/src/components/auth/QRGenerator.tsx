@@ -114,7 +114,7 @@ export default function QRGenerator() {
       
       {qrUrl && (
         <div className="mt-4 flex flex-col items-center">
-          <div className="bg-white p-4 rounded-md mb-3">
+          <div className="bg-white p-4 rounded-md mb-3 qr-container">
             <QRCode value={qrUrl} size={200} />
           </div>
           <p className="text-sm text-gray-500 text-center mb-3">

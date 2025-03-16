@@ -188,6 +188,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(userResponse);
   });
 
+  // QR code authentication routes
+  app.post('/api/auth/generate-qr-token', isAuthenticated, async (req, res, next) => {
+    try {
+      const user = req.user as any;
+      
+      // Generate a secure random token
+      const secureToken = await bcrypt.hash(user.id.toString() + Date.now().toString(), 10);
+      
+      // Update user with secure token and enable QR
+      const updatedUser = await storage.updateUser(user.id, { 
+        secureToken, 
+        qrEnabled: true 
+      });
+      
+      if (!updatedUser) {
+        return res.status(400).json({ message: 'Failed to enable QR login' });
+      }
+      
+      // Create QR code URL with user ID and token
+      // This would typically be a deep link to your app in production
+      const qrUrl = `kidventure://qr-login?uid=${user.id}&token=${secureToken}`;
+      
+      res.json({ 
+        success: true,
+        qrUrl,
+        message: 'QR code generated successfully' 
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post('/api/auth/disable-qr', isAuthenticated, async (req, res, next) => {
+    try {
+      const user = req.user as any;
+      
+      // Disable QR login by removing token and setting qrEnabled to false
+      const updatedUser = await storage.updateUser(user.id, { 
+        secureToken: null, 
+        qrEnabled: false 
+      });
+      
+      if (!updatedUser) {
+        return res.status(400).json({ message: 'Failed to disable QR login' });
+      }
+      
+      res.json({ 
+        success: true,
+        message: 'QR login disabled successfully' 
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post('/api/auth/qr-login', async (req, res, next) => {
+    try {
+      const { uid, token } = req.body;
+      
+      if (!uid || !token) {
+        return res.status(400).json({ message: 'Invalid QR code data' });
+      }
+      
+      const userId = Number(uid);
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.qrEnabled || user.secureToken !== token) {
+        return res.status(401).json({ message: 'Invalid or expired QR code' });
+      }
+      
+      // Log the user in
+      req.logIn(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+        
+        // Remove password from response
+        const { password, ...userResponse } = user;
+        return res.json(userResponse);
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   // Branch routes
   app.get('/api/branches', async (_req, res, next) => {
     try {
