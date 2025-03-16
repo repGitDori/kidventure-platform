@@ -152,6 +152,18 @@ export const contactMessages = pgTable("contact_messages", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Profile change requests
+export const profileChangeRequests = pgTable("profile_change_requests", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  requestData: jsonb("request_data").notNull(), // JSON object with requested changes
+  status: text("status").notNull().default('pending'), // pending, approved, rejected
+  adminId: integer("admin_id").references(() => users.id),
+  adminNotes: text("admin_notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertBranchSchema = createInsertSchema(branches).omit({ id: true, createdAt: true });
@@ -164,6 +176,7 @@ export const insertAppointmentSchema = createInsertSchema(appointments).omit({ i
 export const insertResourceSchema = createInsertSchema(resources).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertWaitlistSchema = createInsertSchema(waitlist).omit({ id: true, createdAt: true });
 export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({ id: true, createdAt: true });
+export const insertProfileChangeRequestSchema = createInsertSchema(profileChangeRequests).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Login schema
 export const loginSchema = z.object({
@@ -194,4 +207,6 @@ export type Waitlist = typeof waitlist.$inferSelect;
 export type InsertWaitlist = z.infer<typeof insertWaitlistSchema>;
 export type ContactMessage = typeof contactMessages.$inferSelect;
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
+export type ProfileChangeRequest = typeof profileChangeRequests.$inferSelect;
+export type InsertProfileChangeRequest = z.infer<typeof insertProfileChangeRequestSchema>;
 export type Login = z.infer<typeof loginSchema>;
