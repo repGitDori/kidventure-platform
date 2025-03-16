@@ -116,31 +116,31 @@ export class MemStorage implements IStorage {
     this.waitlistEntries = new Map();
     this.contactMessages = new Map();
     
-    // Create admin user
+    // Create admin user (Dorian with password 'cangetin')
     this.createUser({
-      email: 'admin@kidventure.com',
-      password: bcrypt.hashSync('password123', 10),
-      firstName: 'Admin',
-      lastName: 'User',
+      email: 'dorian@kidventure.com',
+      password: bcrypt.hashSync('cangetin', 10),
+      firstName: 'Dorian',
+      lastName: 'Admin',
       role: Role.ADMIN
     });
     
-    // Create staff user
+    // Create customer user (Sarah with password 'cangetin')
+    this.createUser({
+      email: 'sarah@kidventure.com',
+      password: bcrypt.hashSync('cangetin', 10),
+      firstName: 'Sarah',
+      lastName: 'Parent',
+      role: Role.PARENT
+    });
+    
+    // Create additional staff user for demo purposes
     this.createUser({
       email: 'staff@kidventure.com',
       password: bcrypt.hashSync('password123', 10),
       firstName: 'Staff',
       lastName: 'User',
       role: Role.STAFF
-    });
-    
-    // Create parent user
-    this.createUser({
-      email: 'parent@kidventure.com',
-      password: bcrypt.hashSync('password123', 10),
-      firstName: 'Parent',
-      lastName: 'User',
-      role: Role.PARENT
     });
     
     // Create sample branches
@@ -169,20 +169,20 @@ export class MemStorage implements IStorage {
       isManager: true
     });
     
-    // Create sample children for parent
+    // Create sample children for parent (Sarah)
     this.createChild({
       firstName: 'Emma',
-      lastName: 'Johnson',
+      lastName: 'Parent',
       dateOfBirth: new Date('2017-05-12'),
-      parentId: 3, // Parent user
+      parentId: 2, // Sarah (parent user)
       notes: 'Allergic to nuts'
     });
     
     this.createChild({
       firstName: 'Noah',
-      lastName: 'Johnson',
+      lastName: 'Parent',
       dateOfBirth: new Date('2019-11-03'),
-      parentId: 3, // Parent user
+      parentId: 2, // Sarah (parent user)
       notes: ''
     });
     
