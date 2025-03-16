@@ -162,6 +162,10 @@ export default function ChildrenPage() {
       firstName: "",
       lastName: "",
       dateOfBirth: format(new Date(), 'yyyy-MM-dd'),
+      eyeColor: "",
+      hairColor: "",
+      customField: "",
+      customFieldValue: "",
       notes: ""
     }
   });
@@ -294,6 +298,66 @@ export default function ChildrenPage() {
                         )}
                       />
                       
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={addForm.control}
+                          name="eyeColor"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Eye Color</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Blue, Brown, Green, etc." />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={addForm.control}
+                          name="hairColor"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Hair Color</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Blonde, Brown, Black, etc." />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={addForm.control}
+                          name="customField"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Custom Field</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="e.g., Allergies" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={addForm.control}
+                          name="customFieldValue"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Custom Value</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="e.g., Peanuts, Dairy" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      
                       <FormField
                         control={addForm.control}
                         name="notes"
@@ -301,7 +365,7 @@ export default function ChildrenPage() {
                           <FormItem>
                             <FormLabel>Special Notes</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Allergies, medical conditions, etc." />
+                              <Input {...field} placeholder="Additional information or medical conditions" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -461,6 +525,66 @@ export default function ChildrenPage() {
                                     )}
                                   />
                                   
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <FormField
+                                      control={editForm.control}
+                                      name="eyeColor"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Eye Color</FormLabel>
+                                          <FormControl>
+                                            <Input {...field} placeholder="Blue, Brown, Green, etc." />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    
+                                    <FormField
+                                      control={editForm.control}
+                                      name="hairColor"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Hair Color</FormLabel>
+                                          <FormControl>
+                                            <Input {...field} placeholder="Blonde, Brown, Black, etc." />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <FormField
+                                      control={editForm.control}
+                                      name="customField"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Custom Field</FormLabel>
+                                          <FormControl>
+                                            <Input {...field} placeholder="e.g., Allergies" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    
+                                    <FormField
+                                      control={editForm.control}
+                                      name="customFieldValue"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Custom Value</FormLabel>
+                                          <FormControl>
+                                            <Input {...field} placeholder="e.g., Peanuts, Dairy" />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                  </div>
+                                  
                                   <FormField
                                     control={editForm.control}
                                     name="notes"
@@ -468,7 +592,7 @@ export default function ChildrenPage() {
                                       <FormItem>
                                         <FormLabel>Special Notes</FormLabel>
                                         <FormControl>
-                                          <Input {...field} placeholder="Allergies, medical conditions, etc." />
+                                          <Input {...field} placeholder="Additional information or medical conditions" />
                                         </FormControl>
                                         <FormMessage />
                                       </FormItem>
