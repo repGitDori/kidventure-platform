@@ -17,6 +17,9 @@ export const users = pgTable("users", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   role: text("role", { enum: Object.values(Role) }).notNull().default(Role.PARENT),
+  secureToken: text("secure_token"),
+  driverLicense: text("driver_license"),
+  qrEnabled: boolean("qr_enabled").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
