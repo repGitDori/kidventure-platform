@@ -173,6 +173,10 @@ export default function ChildrenPage() {
       firstName: "",
       lastName: "",
       dateOfBirth: "",
+      eyeColor: "",
+      hairColor: "",
+      customField: "",
+      customFieldValue: "",
       notes: ""
     }
   });
@@ -196,6 +200,10 @@ export default function ChildrenPage() {
       firstName: child.firstName,
       lastName: child.lastName,
       dateOfBirth: format(new Date(child.dateOfBirth), 'yyyy-MM-dd'),
+      eyeColor: child.eyeColor || "",
+      hairColor: child.hairColor || "",
+      customField: child.customField || "",
+      customFieldValue: child.customFieldValue || "",
       notes: child.notes || ""
     });
     setIsEditDialogOpen(true);
@@ -329,7 +337,7 @@ export default function ChildrenPage() {
             user.role === Role.PARENT ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {children.map((child: any) => (
-                  <Card key={child.id} className="overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                  <Card key={child.id} className="overflow-hidden shadow-md hover:shadow-lg transition-shadow border-2 border-primary/10">
                     <CardHeader className="p-0">
                       <div className="relative h-40 w-full bg-gradient-to-r from-primary/20 to-primary/10">
                         {child.profileImage ? (
@@ -349,10 +357,45 @@ export default function ChildrenPage() {
                       <div className="mb-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <CardTitle className="text-xl font-bold">{child.firstName} {child.lastName}</CardTitle>
-                            <CardDescription className="text-sm">
+                            <CardTitle className="text-xl font-bold text-primary">{child.firstName} {child.lastName}</CardTitle>
+                            <CardDescription className="text-sm flex items-center mt-1">
+                              <Calendar className="h-4 w-4 mr-2 text-primary/60" />
                               Age: {calculateChildAge(new Date(child.dateOfBirth))}
                             </CardDescription>
+                            
+                            {/* Visual characteristics section */}
+                            <div className="mt-3 grid grid-cols-2 gap-2">
+                              {child.eyeColor && (
+                                <div className="flex items-center">
+                                  <div 
+                                    className="h-4 w-4 rounded-full mr-2" 
+                                    style={{ 
+                                      backgroundColor: child.eyeColor.toLowerCase().includes('blue') ? 'blue' :
+                                                    child.eyeColor.toLowerCase().includes('brown') ? 'brown' :
+                                                    child.eyeColor.toLowerCase().includes('green') ? 'green' :
+                                                    child.eyeColor.toLowerCase().includes('hazel') ? '#a18262' :
+                                                    '#aaa'
+                                    }}
+                                  />
+                                  <span className="text-xs text-gray-600">Eyes: {child.eyeColor}</span>
+                                </div>
+                              )}
+                              {child.hairColor && (
+                                <div className="flex items-center">
+                                  <div 
+                                    className="h-4 w-4 rounded-full mr-2" 
+                                    style={{ 
+                                      backgroundColor: child.hairColor.toLowerCase().includes('blonde') ? '#f1c27d' :
+                                                    child.hairColor.toLowerCase().includes('brown') ? '#8d4004' :
+                                                    child.hairColor.toLowerCase().includes('black') ? 'black' :
+                                                    child.hairColor.toLowerCase().includes('red') ? '#d1462f' :
+                                                    '#aaa'
+                                    }}
+                                  />
+                                  <span className="text-xs text-gray-600">Hair: {child.hairColor}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                           <Dialog open={isEditDialogOpen && selectedChild?.id === child.id} onOpenChange={(open) => {
                             if (!open) setSelectedChild(null);
