@@ -329,119 +329,130 @@ export default function ChildrenPage() {
             user.role === Role.PARENT ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {children.map((child: any) => (
-                  <Card key={child.id}>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <User className="h-5 w-5 text-primary" />
+                  <Card key={child.id} className="overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                    <CardHeader className="p-0">
+                      <div className="relative h-40 w-full bg-gradient-to-r from-primary/20 to-primary/10">
+                        {child.profileImage ? (
+                          <img 
+                            src={child.profileImage} 
+                            alt={`${child.firstName}'s photo`} 
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <User className="h-16 w-16 text-primary/40" />
                           </div>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between">
                           <div>
-                            <CardTitle>{child.firstName} {child.lastName}</CardTitle>
-                            <CardDescription>
+                            <CardTitle className="text-xl font-bold">{child.firstName} {child.lastName}</CardTitle>
+                            <CardDescription className="text-sm">
                               Age: {calculateChildAge(new Date(child.dateOfBirth))}
                             </CardDescription>
                           </div>
+                          <Dialog open={isEditDialogOpen && selectedChild?.id === child.id} onOpenChange={(open) => {
+                            if (!open) setSelectedChild(null);
+                            setIsEditDialogOpen(open);
+                          }}>
+                            <DialogTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => handleEditClick(child)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Edit Child Information</DialogTitle>
+                                <DialogDescription>
+                                  Update your child's information below.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <Form {...editForm}>
+                                <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+                                  <FormField
+                                    control={editForm.control}
+                                    name="firstName"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>First Name</FormLabel>
+                                        <FormControl>
+                                          <Input {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                  
+                                  <FormField
+                                    control={editForm.control}
+                                    name="lastName"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>Last Name</FormLabel>
+                                        <FormControl>
+                                          <Input {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                  
+                                  <FormField
+                                    control={editForm.control}
+                                    name="dateOfBirth"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>Date of Birth</FormLabel>
+                                        <FormControl>
+                                          <Input type="date" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                  
+                                  <FormField
+                                    control={editForm.control}
+                                    name="notes"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>Special Notes</FormLabel>
+                                        <FormControl>
+                                          <Input {...field} placeholder="Allergies, medical conditions, etc." />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                  
+                                  <DialogFooter>
+                                    <Button 
+                                      type="submit" 
+                                      disabled={updateChildMutation.isPending}
+                                      className="w-full"
+                                    >
+                                      {updateChildMutation.isPending ? (
+                                        <>
+                                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                          Updating...
+                                        </>
+                                      ) : "Update Child"}
+                                    </Button>
+                                  </DialogFooter>
+                                </form>
+                              </Form>
+                            </DialogContent>
+                          </Dialog>
                         </div>
-                        <Dialog open={isEditDialogOpen && selectedChild?.id === child.id} onOpenChange={(open) => {
-                          if (!open) setSelectedChild(null);
-                          setIsEditDialogOpen(open);
-                        }}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleEditClick(child)}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Edit Child Information</DialogTitle>
-                              <DialogDescription>
-                                Update your child's information below.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <Form {...editForm}>
-                              <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
-                                <FormField
-                                  control={editForm.control}
-                                  name="firstName"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>First Name</FormLabel>
-                                      <FormControl>
-                                        <Input {...field} />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                
-                                <FormField
-                                  control={editForm.control}
-                                  name="lastName"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Last Name</FormLabel>
-                                      <FormControl>
-                                        <Input {...field} />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                
-                                <FormField
-                                  control={editForm.control}
-                                  name="dateOfBirth"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Date of Birth</FormLabel>
-                                      <FormControl>
-                                        <Input type="date" {...field} />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                
-                                <FormField
-                                  control={editForm.control}
-                                  name="notes"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Special Notes</FormLabel>
-                                      <FormControl>
-                                        <Input {...field} placeholder="Allergies, medical conditions, etc." />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                
-                                <DialogFooter>
-                                  <Button 
-                                    type="submit" 
-                                    disabled={updateChildMutation.isPending}
-                                    className="w-full"
-                                  >
-                                    {updateChildMutation.isPending ? (
-                                      <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Updating...
-                                      </>
-                                    ) : "Update Child"}
-                                  </Button>
-                                </DialogFooter>
-                              </form>
-                            </Form>
-                          </DialogContent>
-                        </Dialog>
                       </div>
-                    </CardHeader>
-                    <CardContent>
+                      
                       <Tabs defaultValue="info">
                         <TabsList className="grid w-full grid-cols-3">
                           <TabsTrigger value="info">Info</TabsTrigger>
@@ -458,7 +469,55 @@ export default function ChildrenPage() {
                               <p className="text-sm font-medium text-gray-500">Age</p>
                               <p>{calculateChildAge(new Date(child.dateOfBirth))} years</p>
                             </div>
+                            
+                            {child.eyeColor && (
+                              <div>
+                                <p className="text-sm font-medium text-gray-500">Eye Color</p>
+                                <div className="flex items-center gap-2">
+                                  <div 
+                                    className="w-4 h-4 rounded-full" 
+                                    style={{ 
+                                      backgroundColor: 
+                                        child.eyeColor.toLowerCase() === 'blue' ? '#3b82f6' : 
+                                        child.eyeColor.toLowerCase() === 'brown' ? '#92400e' :
+                                        child.eyeColor.toLowerCase() === 'green' ? '#16a34a' :
+                                        child.eyeColor.toLowerCase() === 'hazel' ? '#a16207' :
+                                        '#6b7280'
+                                    }}
+                                  />
+                                  <p>{child.eyeColor}</p>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {child.hairColor && (
+                              <div>
+                                <p className="text-sm font-medium text-gray-500">Hair Color</p>
+                                <div className="flex items-center gap-2">
+                                  <div 
+                                    className="w-4 h-4 rounded-full" 
+                                    style={{ 
+                                      backgroundColor: 
+                                        child.hairColor.toLowerCase() === 'blonde' ? '#fbbf24' : 
+                                        child.hairColor.toLowerCase() === 'brown' ? '#92400e' :
+                                        child.hairColor.toLowerCase() === 'black' ? '#1f2937' :
+                                        child.hairColor.toLowerCase() === 'red' ? '#dc2626' :
+                                        '#6b7280'
+                                    }}
+                                  />
+                                  <p>{child.hairColor}</p>
+                                </div>
+                              </div>
+                            )}
                           </div>
+                          
+                          {child.customField && child.customFieldValue && (
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">{child.customField}</p>
+                              <p className="text-sm">{child.customFieldValue}</p>
+                            </div>
+                          )}
+                          
                           {child.notes && (
                             <div>
                               <p className="text-sm font-medium text-gray-500">Special Notes</p>
