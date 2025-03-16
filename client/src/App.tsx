@@ -16,6 +16,7 @@ import BranchDetailPage from "@/pages/branches/[id]";
 import SchedulePage from "@/pages/schedule";
 import ResourcesPage from "@/pages/resources";
 import ProfilePage from "@/pages/profile";
+import ChildrenPage from "@/pages/children";
 import { useEffect, useState, createContext } from "react";
 
 export const UserContext = createContext<{
@@ -44,6 +45,7 @@ function Router() {
       <Route path="/branches/:id" component={BranchDetailPage} />
       <Route path="/schedule" component={SchedulePage} />
       <Route path="/resources" component={ResourcesPage} />
+      <Route path="/children" component={ChildrenPage} />
       <Route component={NotFound} />
     </Switch>
   );
