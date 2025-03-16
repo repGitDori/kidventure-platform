@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/landing";
 import LoginPage from "@/pages/auth/login";
 import RegisterPage from "@/pages/auth/register";
+import QRLoginPage from "@/pages/auth/qr-login";
 import DashboardPage from "@/pages/dashboard";
 import AdminDashboard from "@/pages/dashboard/admin";
 import StaffDashboard from "@/pages/dashboard/staff";
@@ -14,6 +15,7 @@ import BranchesPage from "@/pages/branches";
 import BranchDetailPage from "@/pages/branches/[id]";
 import SchedulePage from "@/pages/schedule";
 import ResourcesPage from "@/pages/resources";
+import ProfilePage from "@/pages/profile";
 import { useEffect, useState, createContext } from "react";
 
 export const UserContext = createContext<{
@@ -32,6 +34,8 @@ function Router() {
       <Route path="/" component={LandingPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
+      <Route path="/qr-login" component={QRLoginPage} />
+      <Route path="/profile" component={ProfilePage} />
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/dashboard/admin" component={AdminDashboard} />
       <Route path="/dashboard/staff" component={StaffDashboard} />
