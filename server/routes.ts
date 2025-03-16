@@ -767,6 +767,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Profile change request routes
+  // Submit a profile change request
+  app.post('/api/users/profile-requests', isAuthenticated, async (req, res, next) => {
+    try {
+      const user = req.user as any;
+      
+      const result = insertProfileChangeRequestSchema.safeParse({
+        ...req.body,
+        userId: user.id,
+      });
+      
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      
+      const request = await storage.createProfileChangeRequest(result.data);
+      res.status(201).json(request);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Get profile change requests for current user
+  app.get('/api/users/profile-requests', isAuthenticated, async (req, res, next) => {
+    try {
+      const user = req.user as any;
+      const requests = await storage.getProfileChangeRequestsByUser(user.id);
+      res.json(requests);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Get specific profile change request
+  app.get('/api/users/profile-requests/:id', isAuthenticated, async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      const user = req.user as any;
+      
+      const request = await storage.getProfileChangeRequestById(id);
+      if (!request) {
+        return res.status(404).json({ message: 'Profile change request not found' });
+      }
+      
+      // Only allow users to view their own requests (unless admin)
+      if (request.userId !== user.id && user.role !== Role.ADMIN) {
+        return res.status(403).json({ message: 'You are not authorized to view this request' });
+      }
+      
+      res.json(request);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Admin routes for profile change requests
+  // Get all pending profile change requests
+  app.get('/api/admin/profile-requests', hasRole([Role.ADMIN]), async (req, res, next) => {
+    try {
+      const requests = await storage.getPendingProfileChangeRequests();
+      res.json(requests);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Approve a profile change request
+  app.post('/api/admin/profile-requests/:id/approve', hasRole([Role.ADMIN]), async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      const adminUser = req.user as any;
+      const notes = req.body.notes;
+      
+      const request = await storage.approveProfileChangeRequest(id, adminUser.id, notes);
+      if (!request) {
+        return res.status(404).json({ message: 'Profile change request not found' });
+      }
+      
+      res.json(request);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Reject a profile change request
+  app.post('/api/admin/profile-requests/:id/reject', hasRole([Role.ADMIN]), async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      const adminUser = req.user as any;
+      const notes = req.body.notes;
+      
+      const request = await storage.rejectProfileChangeRequest(id, adminUser.id, notes);
+      if (!request) {
+        return res.status(404).json({ message: 'Profile change request not found' });
+      }
+      
+      res.json(request);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

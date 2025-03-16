@@ -77,3 +77,22 @@ export interface BranchSelectorOption {
   id: number;
   name: string;
 }
+
+export interface ProfileChangeRequestFormData {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  driverLicense?: File | null;
+  requestData?: Record<string, any>; // For storing JSON data of the changes
+}
+
+export interface ProfileChangeRequest {
+  id: number;
+  userId: number;
+  status: 'pending' | 'approved' | 'rejected';
+  requestData: Record<string, any>;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  adminId: number | null;
+  adminNotes: string | null;
+}
