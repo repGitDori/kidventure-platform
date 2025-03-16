@@ -214,7 +214,8 @@ export default function ChildrenPage() {
       hairColor: "",
       customField: "",
       customFieldValue: "",
-      notes: ""
+      notes: "",
+      parentId: user?.role === Role.ADMIN ? undefined : user?.id
     }
   });
 
@@ -229,7 +230,8 @@ export default function ChildrenPage() {
       hairColor: "",
       customField: "",
       customFieldValue: "",
-      notes: ""
+      notes: "",
+      parentId: undefined
     }
   });
 
@@ -256,7 +258,8 @@ export default function ChildrenPage() {
       hairColor: child.hairColor || "",
       customField: child.customField || "",
       customFieldValue: child.customFieldValue || "",
-      notes: child.notes || ""
+      notes: child.notes || "",
+      parentId: child.parentId
     });
     setIsEditDialogOpen(true);
   };
@@ -432,6 +435,36 @@ export default function ChildrenPage() {
                           </FormItem>
                         )}
                       />
+                      
+                      {user.role === Role.ADMIN && (
+                        <FormField
+                          control={addForm.control}
+                          name="parentId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Assign to Parent</FormLabel>
+                              <Select 
+                                onValueChange={(value) => field.onChange(parseInt(value))}
+                                defaultValue={field.value?.toString()}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select a parent" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {users && users.filter((u: any) => u.role === Role.PARENT).map((user: any) => (
+                                    <SelectItem key={user.id} value={user.id.toString()}>
+                                      {user.firstName} {user.lastName} ({user.email})
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
                       
                       <DialogFooter>
                         <Button 
@@ -660,6 +693,36 @@ export default function ChildrenPage() {
                                     )}
                                   />
                                   
+                                  {user.role === Role.ADMIN && (
+                                    <FormField
+                                      control={editForm.control}
+                                      name="parentId"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Assign to Parent</FormLabel>
+                                          <Select 
+                                            onValueChange={(value) => field.onChange(parseInt(value))}
+                                            defaultValue={field.value?.toString()}
+                                          >
+                                            <FormControl>
+                                              <SelectTrigger>
+                                                <SelectValue placeholder="Select a parent" />
+                                              </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                              {users && users.filter((u: any) => u.role === Role.PARENT).map((user: any) => (
+                                                <SelectItem key={user.id} value={user.id.toString()}>
+                                                  {user.firstName} {user.lastName} ({user.email})
+                                                </SelectItem>
+                                              ))}
+                                            </SelectContent>
+                                          </Select>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                  )}
+                                  
                                   <DialogFooter>
                                     <Button 
                                       type="submit" 
@@ -863,7 +926,7 @@ export default function ChildrenPage() {
                               <FormItem>
                                 <FormLabel>Parent (required)</FormLabel>
                                 <Select 
-                                  onValueChange={field.onChange} 
+                                  onValueChange={(value) => field.onChange(parseInt(value))} 
                                   defaultValue={field.value?.toString()}
                                 >
                                   <FormControl>
@@ -1124,7 +1187,7 @@ export default function ChildrenPage() {
                                           <FormItem>
                                             <FormLabel>Parent (required)</FormLabel>
                                             <Select 
-                                              onValueChange={field.onChange} 
+                                              onValueChange={(value) => field.onChange(parseInt(value))} 
                                               defaultValue={field.value?.toString()}
                                               value={field.value?.toString()}
                                             >
