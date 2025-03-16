@@ -58,7 +58,9 @@ export interface FooterSection {
 }
 
 export interface AuthFormData {
-  email: string;
+  identifier?: string;  // For login (username or email)
+  email?: string;      // For registration
+  username?: string;   // For registration
   password: string;
   firstName?: string;
   lastName?: string;

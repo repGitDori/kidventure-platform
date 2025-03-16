@@ -166,8 +166,8 @@ export const insertContactMessageSchema = createInsertSchema(contactMessages).om
 
 // Login schema
 export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6)
+  identifier: z.string().min(1, { message: "Username or email is required" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" })
 });
 
 // Types
