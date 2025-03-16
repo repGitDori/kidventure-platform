@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Child } from "@shared/schema";
+import { Child, Role } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { UserContext } from "@/App";
+import { useQuery } from "@tanstack/react-query";
 
 import {
   Form,
@@ -20,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload, User } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Schema for the child form
 const childFormSchema = z.object({
@@ -32,6 +35,7 @@ const childFormSchema = z.object({
   customFieldValue: z.string().optional(),
   notes: z.string().optional(),
   profileImage: z.string().optional(),
+  parentId: z.number().optional(), // For admin reassignment
 });
 
 export type ChildFormValues = z.infer<typeof childFormSchema>;
@@ -43,8 +47,15 @@ interface ChildFormProps {
 }
 
 export default function ChildForm({ child, onSubmit, isSubmitting }: ChildFormProps) {
+  const { user } = useContext(UserContext);
   const { toast } = useToast();
   const [previewImage, setPreviewImage] = useState<string | null>(child?.profileImage || null);
+  
+  // Fetch users for admin features
+  const { data: users } = useQuery({
+    queryKey: ['/api/users'],
+    enabled: !!user && user.role === Role.ADMIN
+  });
 
   const form = useForm<ChildFormValues>({
     resolver: zodResolver(childFormSchema),
@@ -58,6 +69,7 @@ export default function ChildForm({ child, onSubmit, isSubmitting }: ChildFormPr
       customFieldValue: child?.customFieldValue || "",
       notes: child?.notes || "",
       profileImage: child?.profileImage || "",
+      parentId: child?.parentId || (user?.role !== Role.ADMIN ? user?.id : undefined)
     },
   });
 
@@ -204,6 +216,39 @@ export default function ChildForm({ child, onSubmit, isSubmitting }: ChildFormPr
             />
           </div>
         </div>
+
+        {user?.role === Role.ADMIN && (
+          <FormField
+            control={form.control}
+            name="parentId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Assign to Parent</FormLabel>
+                <Select 
+                  onValueChange={(value) => field.onChange(parseInt(value))}
+                  defaultValue={field.value?.toString()}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a parent" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Array.isArray(users) && users
+                      .filter((u: any) => u.role === Role.PARENT)
+                      .map((user: any) => (
+                        <SelectItem key={user.id} value={user.id.toString()}>
+                          {user.firstName} {user.lastName} ({user.email})
+                        </SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}
