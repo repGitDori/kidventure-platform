@@ -20,9 +20,11 @@ import { Loader2 } from "lucide-react";
 import type { AuthFormData } from "@/lib/types";
 
 const registerSchema = z.object({
+  username: z.string().min(3, { message: "Username must be at least 3 characters" })
+    .regex(/^[a-zA-Z0-9_]+$/, { message: "Username can only contain letters, numbers, and underscores" }),
   firstName: z.string().min(2, { message: "First name is required" }),
   lastName: z.string().min(2, { message: "Last name is required" }),
-  email: z.string().email({ message: "Invalid email address" }),
+  email: z.string().email({ message: "Invalid email address" }).optional(),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -39,6 +41,7 @@ export default function RegisterForm() {
   const form = useForm<AuthFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      username: "",
       firstName: "",
       lastName: "",
       email: "",
@@ -79,6 +82,25 @@ export default function RegisterForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Choose a username"
+                  autoComplete="username"
+                  {...field}
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
@@ -124,7 +146,7 @@ export default function RegisterForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Email (Optional)</FormLabel>
               <FormControl>
                 <Input
                   type="email"

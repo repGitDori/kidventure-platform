@@ -20,7 +20,7 @@ import { Loader2 } from "lucide-react";
 import type { AuthFormData } from "@/lib/types";
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
+  identifier: z.string().min(1, { message: "Username or email is required" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 });
 
@@ -33,7 +33,7 @@ export default function LoginForm() {
   const form = useForm<AuthFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      identifier: "",
       password: "",
     },
   });
@@ -59,7 +59,7 @@ export default function LoginForm() {
       
       toast({
         title: "Login failed",
-        description: "Invalid email or password. Please try again.",
+        description: "Invalid username/email or password. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -72,15 +72,15 @@ export default function LoginForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="email"
+          name="identifier"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Username or Email</FormLabel>
               <FormControl>
                 <Input
-                  type="email"
-                  placeholder="your.email@example.com"
-                  autoComplete="email"
+                  type="text"
+                  placeholder="username or email@example.com"
+                  autoComplete="username email"
                   {...field}
                   disabled={isSubmitting}
                 />
