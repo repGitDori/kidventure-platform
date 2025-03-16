@@ -85,6 +85,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const user = req.user as any;
+      // Admin users have access to everything
+      if (user.role === Role.ADMIN) {
+        return next();
+      }
+      
       if (!roles.includes(user.role)) {
         return res.status(403).json({ message: 'Forbidden' });
       }
