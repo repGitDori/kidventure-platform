@@ -117,6 +117,9 @@ export default function Header() {
               <span className="text-sm text-gray-600">
                 Hello, {user.firstName}
               </span>
+              <Link href="/profile" className="text-gray-700 hover:text-primary transition-colors">
+                Profile
+              </Link>
               <Button 
                 variant="outline" 
                 onClick={handleLogout}
@@ -202,6 +205,13 @@ export default function Header() {
                     <div className="text-sm text-gray-600 px-3">
                       Logged in as {user.firstName} {user.lastName}
                     </div>
+                    <Link 
+                      href="/profile"
+                      className="px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
                     <Button 
                       className="w-full" 
                       variant="outline" 
