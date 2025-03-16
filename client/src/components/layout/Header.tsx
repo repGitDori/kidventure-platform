@@ -69,8 +69,8 @@ export default function Header() {
             </div>
           </div>
           <div>
-            <Link href="/">
-              <a className="font-heading font-bold text-2xl text-primary-dark">Kid-Venture</a>
+            <Link href="/" className="font-heading font-bold text-2xl text-primary-dark">
+              Kid-Venture
             </Link>
             <p className="text-xs text-neutral-500">Learning made fun</p>
           </div>
@@ -92,18 +92,18 @@ export default function Header() {
             ) : (
               <>
                 <li>
-                  <Link href="/dashboard">
-                    <a className="text-gray-700 hover:text-primary transition-colors">Dashboard</a>
+                  <Link href="/dashboard" className="text-gray-700 hover:text-primary transition-colors">
+                    Dashboard
                   </Link>
                 </li>
                 <li>
-                  <Link href="/schedule">
-                    <a className="text-gray-700 hover:text-primary transition-colors">Schedule</a>
+                  <Link href="/schedule" className="text-gray-700 hover:text-primary transition-colors">
+                    Schedule
                   </Link>
                 </li>
                 <li>
-                  <Link href="/resources">
-                    <a className="text-gray-700 hover:text-primary transition-colors">Resources</a>
+                  <Link href="/resources" className="text-gray-700 hover:text-primary transition-colors">
+                    Resources
                   </Link>
                 </li>
               </>
@@ -171,29 +171,26 @@ export default function Header() {
                   ))
                 ) : (
                   <>
-                    <Link href="/dashboard">
-                      <a 
-                        className="px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-colors"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Dashboard
-                      </a>
+                    <Link 
+                      href="/dashboard"
+                      className="px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Dashboard
                     </Link>
-                    <Link href="/schedule">
-                      <a 
-                        className="px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-colors"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Schedule
-                      </a>
+                    <Link 
+                      href="/schedule"
+                      className="px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Schedule
                     </Link>
-                    <Link href="/resources">
-                      <a 
-                        className="px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-colors"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Resources
-                      </a>
+                    <Link 
+                      href="/resources"
+                      className="px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Resources
                     </Link>
                   </>
                 )}

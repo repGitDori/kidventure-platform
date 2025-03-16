@@ -79,10 +79,8 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               {quickLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.url}>
-                    <a className="text-gray-400 hover:text-white transition-colors">
-                      {link.label}
-                    </a>
+                  <Link href={link.url} className="text-gray-400 hover:text-white transition-colors">
+                    {link.label}
                   </Link>
                 </li>
               ))}
@@ -94,10 +92,8 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               {legalLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.url}>
-                    <a className="text-gray-400 hover:text-white transition-colors">
-                      {link.label}
-                    </a>
+                  <Link href={link.url} className="text-gray-400 hover:text-white transition-colors">
+                    {link.label}
                   </Link>
                 </li>
               ))}
