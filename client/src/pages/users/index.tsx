@@ -1,8 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Edit, User, Eye, Upload, MessageSquare, Lock } from "lucide-react";
+import { Edit, User, Eye, Upload, MessageSquare, Lock, PlusCircle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { User as UserType, Role } from "@shared/schema";
+import { UserContext } from "@/App";
+import { SpinningAddButton } from "@/components/users/SpinningAddButton";
+import { AddUserDialog } from "@/components/users/AddUserDialog";
 
 import {
   Card,
