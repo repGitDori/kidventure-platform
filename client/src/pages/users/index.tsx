@@ -109,8 +109,11 @@ export default function UsersPage() {
 
   const impersonateUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      const response = await apiRequest(`/api/admin/impersonate/${userId}`, {
-        method: "POST",
+      const response = await apiRequest('/api/admin/impersonate/' + userId, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       return response;
     },
