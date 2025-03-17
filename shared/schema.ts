@@ -153,6 +153,11 @@ export const waitlist = pgTable("waitlist", {
   role: text("role").notNull(),
   interests: jsonb("interests").notNull(),
   newsletter: boolean("newsletter").notNull().default(false),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  deviceInfo: jsonb("device_info"),
+  locationInfo: jsonb("location_info"),
+  referrer: text("referrer"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,6 +36,8 @@ const waitlistSchema = z.object({
 export default function WaitlistForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const [deviceInfo, setDeviceInfo] = useState<Record<string, any>>({});
+  const [locationInfo, setLocationInfo] = useState<Record<string, any>>({});
   
   const form = useForm<WaitlistFormData>({
     resolver: zodResolver(waitlistSchema),
@@ -49,11 +51,82 @@ export default function WaitlistForm() {
     },
   });
   
+  // Collect device information
+  useEffect(() => {
+    // Basic device info
+    const info: Record<string, any> = {
+      screenWidth: window.screen.width,
+      screenHeight: window.screen.height,
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      platform: navigator.platform,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timeZoneOffset: new Date().getTimezoneOffset(),
+      cookiesEnabled: navigator.cookieEnabled,
+      browserFingerprint: `${navigator.userAgent}|${navigator.language}|${screen.width}x${screen.height}|${new Date().getTimezoneOffset()}`,
+    };
+    
+    // Add connection info if available
+    if ('connection' in navigator) {
+      const conn = (navigator as any).connection;
+      if (conn) {
+        info.connectionType = conn.effectiveType;
+        info.downlink = conn.downlink;
+        info.rtt = conn.rtt;
+        info.saveData = conn.saveData;
+      }
+    }
+    
+    // Add battery info if available
+    if ('getBattery' in navigator) {
+      (navigator as any).getBattery().then((battery: any) => {
+        info.batteryLevel = battery.level;
+        info.batteryCharging = battery.charging;
+        setDeviceInfo({ ...info });
+      }).catch(() => {
+        setDeviceInfo(info);
+      });
+    } else {
+      setDeviceInfo(info);
+    }
+    
+    // Try to get location information if permitted
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocationInfo({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: position.timestamp
+          });
+        },
+        () => {
+          // Silently handle error - don't want to prompt the user if they decline
+          setLocationInfo({ error: "Geolocation permission denied or unavailable" });
+        },
+        { timeout: 10000, maximumAge: 60000 }
+      );
+    }
+  }, []);
+  
   const onSubmit = async (data: WaitlistFormData) => {
     setIsSubmitting(true);
     
     try {
-      await apiRequest('POST', '/api/waitlist', data);
+      // Enrich the data with device and location information
+      const enrichedData: WaitlistFormData = {
+        ...data,
+        deviceInfo,
+        locationInfo,
+        userAgent: navigator.userAgent,
+        referrer: document.referrer || window.location.href,
+      };
+      
+      await apiRequest('/api/waitlist', {
+        method: 'POST',
+        body: JSON.stringify(enrichedData),
+      });
       
       toast({
         title: "Thanks for joining our waitlist!",

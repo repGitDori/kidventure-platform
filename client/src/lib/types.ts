@@ -32,6 +32,12 @@ export interface WaitlistFormData {
   role: string;
   interests: string[];
   newsletter: boolean;
+  // Extended data (captured automatically by the system)
+  ipAddress?: string;
+  userAgent?: string;
+  deviceInfo?: Record<string, any>;
+  locationInfo?: Record<string, any>;
+  referrer?: string;
 }
 
 export interface ContactFormData {
