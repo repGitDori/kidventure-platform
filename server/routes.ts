@@ -561,7 +561,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
       }
       
-      const waitlistEntry = await storage.addToWaitlist(result.data);
+      // Extract IP address from request
+      let ipAddress: string | undefined = undefined;
+      
+      // Get IP from various possible sources
+      const xForwardedFor = req.headers['x-forwarded-for'];
+      if (xForwardedFor) {
+        ipAddress = Array.isArray(xForwardedFor) 
+          ? xForwardedFor[0] 
+          : xForwardedFor.split(',')[0].trim();
+      } else if (req.socket.remoteAddress) {
+        ipAddress = req.socket.remoteAddress;
+      } else if (req.connection && req.connection.remoteAddress) {
+        ipAddress = req.connection.remoteAddress;
+      }
+      
+      // Combine data with IP address if not already provided
+      const enrichedData = {
+        ...result.data,
+        ipAddress: result.data.ipAddress || ipAddress,
+      };
+      
+      const waitlistEntry = await storage.addToWaitlist(enrichedData);
       res.status(201).json(waitlistEntry);
     } catch (error) {
       next(error);

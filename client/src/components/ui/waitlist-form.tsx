@@ -31,6 +31,12 @@ const waitlistSchema = z.object({
   role: z.string({ required_error: "Please select a role" }),
   interests: z.array(z.string()).min(1, { message: "Select at least one interest" }),
   newsletter: z.boolean().default(false),
+  // Additional fields for tracking (optional in the form since they're added automatically)
+  deviceInfo: z.any().optional(),
+  locationInfo: z.any().optional(),
+  ipAddress: z.string().optional(),
+  userAgent: z.string().optional(),
+  referrer: z.string().optional(),
 });
 
 export default function WaitlistForm() {
@@ -123,10 +129,7 @@ export default function WaitlistForm() {
         referrer: document.referrer || window.location.href,
       };
       
-      await apiRequest('/api/waitlist', {
-        method: 'POST',
-        body: JSON.stringify(enrichedData),
-      });
+      await apiRequest('POST', '/api/waitlist', enrichedData);
       
       toast({
         title: "Thanks for joining our waitlist!",
