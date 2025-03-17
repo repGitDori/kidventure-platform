@@ -74,6 +74,8 @@ export default function UsersPage() {
   const [openDialog, setOpenDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [impersonating, setImpersonating] = useState(false);
+  const [addUserOpen, setAddUserOpen] = useState(false);
+  const { user } = useContext(UserContext);
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['/api/users'],
@@ -132,6 +134,31 @@ export default function UsersPage() {
       toast({
         title: "Error",
         description: "Failed to access user account. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createUserMutation = useMutation({
+    mutationFn: async (userData: any) => {
+      const response = await apiRequest('/api/users', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+      });
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+      toast({
+        title: "User created",
+        description: "The new user has been added successfully.",
+      });
+      setAddUserOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create user. Please check the form and try again.",
         variant: "destructive",
       });
     },
@@ -599,6 +626,23 @@ export default function UsersPage() {
           </Tabs>
         </DialogContent>
       </Dialog>
+
+      {/* Add User Dialog */}
+      <AddUserDialog
+        open={addUserOpen}
+        onOpenChange={setAddUserOpen}
+        onAddUser={(userData) => createUserMutation.mutate(userData)}
+      />
+
+      {/* Floating Action Button - Only visible for admins */}
+      {user?.role === Role.ADMIN && (
+        <div className="fixed bottom-6 right-6">
+          <SpinningAddButton
+            onClick={() => setAddUserOpen(true)}
+            className="shadow-lg"
+          />
+        </div>
+      )}
     </div>
   );
 }
