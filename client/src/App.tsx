@@ -18,6 +18,7 @@ import ResourcesPage from "@/pages/resources";
 import ProfilePage from "@/pages/profile";
 import ChildrenPage from "@/pages/children";
 import UsersPage from "@/pages/users";
+import AdminWaitlistPage from "@/pages/admin/waitlist";
 import { useEffect, useState, createContext } from "react";
 
 export const UserContext = createContext<{
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/resources" component={ResourcesPage} />
       <Route path="/children" component={ChildrenPage} />
       <Route path="/users" component={UsersPage} />
+      <Route path="/admin/waitlist" component={AdminWaitlistPage} />
       <Route component={NotFound} />
     </Switch>
   );

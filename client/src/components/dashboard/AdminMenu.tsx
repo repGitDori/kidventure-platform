@@ -61,7 +61,7 @@ export default function AdminMenu() {
       title: "Waitlist Entries",
       description: "Review and manage waitlist sign-ups",
       icon: <ClipboardList className="h-8 w-8 text-purple-500" />,
-      href: "/waitlist-entries",
+      href: "/admin/waitlist",
     },
     {
       title: "Contact Messages",
