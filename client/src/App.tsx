@@ -15,6 +15,11 @@ import BranchesPage from "@/pages/branches";
 import BranchDetailPage from "@/pages/branches/[id]";
 import SchedulePage from "@/pages/schedule";
 import ResourcesPage from "@/pages/resources";
+import ResourcesManagePage from "@/pages/resources/manage";
+import ReportsPage from "@/pages/reports";
+import StaffAssignmentsPage from "@/pages/staff-assignments";
+import ContactMessagesPage from "@/pages/contact-messages";
+import SettingsPage from "@/pages/settings";
 import ProfilePage from "@/pages/profile";
 import ChildrenPage from "@/pages/children";
 import UsersPage from "@/pages/users";
@@ -47,6 +52,11 @@ function Router() {
       <Route path="/branches/:id" component={BranchDetailPage} />
       <Route path="/schedule" component={SchedulePage} />
       <Route path="/resources" component={ResourcesPage} />
+      <Route path="/resources/manage" component={ResourcesManagePage} />
+      <Route path="/reports" component={ReportsPage} />
+      <Route path="/staff-assignments" component={StaffAssignmentsPage} />
+      <Route path="/contact-messages" component={ContactMessagesPage} />
+      <Route path="/settings" component={SettingsPage} />
       <Route path="/children" component={ChildrenPage} />
       <Route path="/users" component={UsersPage} />
       <Route path="/admin/waitlist" component={AdminWaitlistPage} />
