@@ -122,17 +122,21 @@ export default function SchedulePage() {
     enabled: !!user
   });
   
-  // Fetch appointments
+  // Fetch appointments based on role
   const { data: appointments, isLoading: appointmentsLoading } = useQuery({
-    queryKey: ['/api/appointments', format(selectedWeek, 'yyyy-MM-dd')],
+    queryKey: user?.role === 'parent' 
+      ? ['/api/children', 'appointments'] 
+      : ['/api/appointments', format(selectedWeek, 'yyyy-MM-dd')],
     enabled: !!user
   });
 
-  // Create appointment form
+  // Create appointment form - set first child as default for parents if available
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
-      childId: 0,
+      childId: (user?.role === 'parent' && children && Array.isArray(children) && children.length > 0) 
+        ? children[0]?.id || 0 
+        : 0,
       slotId: 0,
       date: new Date(),
       notes: ""
@@ -222,8 +226,14 @@ export default function SchedulePage() {
   // Function to open appointment dialog with slot
   const openAppointmentDialog = (slot: any) => {
     setSelectedSlot(slot);
+    
+    // For parents, pre-select their first child if available
+    const defaultChildId = (user?.role === 'parent' && children && Array.isArray(children) && children.length > 0) 
+      ? children[0]?.id || 0 
+      : 0;
+      
     form.reset({
-      childId: 0,
+      childId: defaultChildId,
       slotId: slot.id,
       date: new Date(),
       notes: ""

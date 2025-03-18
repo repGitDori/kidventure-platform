@@ -350,16 +350,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const children = await storage.getChildrenByParent(user.id);
         return res.json(children);
       } else {
-        // Admin and staff can see all children for now
-        // In a real app, you might want to filter by branch for staff
-        const allChildren: any[] = [];
-        for (let i = 1; i < storage.userId; i++) {
-          const parentUser = await storage.getUser(i);
-          if (parentUser && parentUser.role === Role.PARENT) {
-            const children = await storage.getChildrenByParent(i);
-            allChildren.push(...children);
-          }
-        }
+        // Admin and staff can see all children
+        const allChildren = await storage.getAllChildren();
         return res.json(allChildren);
       }
     } catch (error) {

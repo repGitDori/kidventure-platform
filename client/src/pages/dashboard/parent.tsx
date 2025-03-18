@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useMemo } from "react";
 import { UserContext } from "@/App";
 import { useQuery } from "@tanstack/react-query";
 import { 
@@ -18,7 +18,9 @@ import {
   Clock, 
   BookOpen,
   CalendarClock,
-  Loader2
+  Loader2,
+  Baby,
+  Users
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
@@ -30,6 +32,26 @@ export default function ParentDashboard() {
   const { data: children, isLoading: loadingChildren } = useQuery({
     queryKey: ['/api/children'],
   });
+  
+  // Group children by age category
+  const childrenByCategory = useMemo(() => {
+    if (!children || !Array.isArray(children)) return { infant: 0, toddler: 0, child: 0 };
+    
+    return children.reduce((acc: { infant: number, toddler: number, child: number }, child: any) => {
+      const dob = new Date(child.dateOfBirth);
+      const ageInYears = Math.floor((new Date().getTime() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      
+      if (ageInYears < 1) {
+        acc.infant++;
+      } else if (ageInYears < 3) {
+        acc.toddler++;
+      } else {
+        acc.child++;
+      }
+      
+      return acc;
+    }, { infant: 0, toddler: 0, child: 0 });
+  }, [children]);
   
   // Set first child as selected once data is loaded
   useEffect(() => {
@@ -62,6 +84,56 @@ export default function ParentDashboard() {
         </p>
       </div>
       
+      {/* Age group summary */}
+      {!loadingChildren && children && children.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card>
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Infants</p>
+                <p className="text-2xl font-bold">{childrenByCategory.infant}</p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                <Baby className="h-5 w-5 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Toddlers</p>
+                <p className="text-2xl font-bold">{childrenByCategory.toddler}</p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                <Baby className="h-5 w-5 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Children</p>
+                <p className="text-2xl font-bold">{childrenByCategory.child}</p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <Users className="h-5 w-5 text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Total</p>
+                <p className="text-2xl font-bold">{children.length}</p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                <Users className="h-5 w-5 text-gray-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Child selector */}
       {loadingChildren ? (
         <Card className="mb-8">
