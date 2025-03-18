@@ -1,4 +1,4 @@
-import { useContext, useState, useMemo } from "react";
+import { useContext, useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserContext } from "@/App";
 import Header from "@/components/layout/Header";
@@ -98,11 +98,12 @@ export default function SchedulePage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Redirect to login if not authenticated
-  if (!userLoading && !user) {
-    setLocation("/login");
-    return null;
-  }
+  // Handle authentication check
+  useEffect(() => {
+    if (!userLoading && !user) {
+      setLocation("/login");
+    }
+  }, [userLoading, user, setLocation]);
   
   // Fetch classes for the selected branch
   const { data: classes, isLoading: classesLoading } = useQuery({
@@ -146,11 +147,29 @@ export default function SchedulePage() {
   // Appointment creation mutation
   const createAppointmentMutation = useMutation({
     mutationFn: async (data: AppointmentFormValues) => {
-      const response = await apiRequest('POST', '/api/appointments', data);
-      return response.json();
+      try {
+        const response = await fetch('/api/appointments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data),
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to create appointment');
+        }
+        
+        return await response.json();
+      } catch (error) {
+        console.error('Create appointment error:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/children', 'appointments'] });
       setIsAddAppointmentOpen(false);
       toast({
         title: "Appointment Booked",

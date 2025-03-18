@@ -112,10 +112,25 @@ export default function StaffAssignmentsPage() {
   // Create assignment mutation
   const createMutation = useMutation({
     mutationFn: async (data: AssignmentFormValues) => {
-      return await apiRequest('/api/staff-branches', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      try {
+        const response = await fetch('/api/staff-branches', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to create assignment');
+        }
+        
+        return await response.json();
+      } catch (error) {
+        console.error('Assignment error:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({
@@ -127,6 +142,7 @@ export default function StaffAssignmentsPage() {
       form.reset();
     },
     onError: (error) => {
+      console.error('Mutation error:', error);
       toast({
         title: "Error",
         description: "Failed to create assignment. Please try again.",
@@ -138,9 +154,24 @@ export default function StaffAssignmentsPage() {
   // Remove assignment mutation
   const removeMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/staff-branches/${id}`, {
-        method: 'DELETE',
-      });
+      try {
+        const response = await fetch(`/api/staff-branches/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to remove assignment');
+        }
+        
+        return await response.json();
+      } catch (error) {
+        console.error('Remove error:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({
@@ -150,6 +181,7 @@ export default function StaffAssignmentsPage() {
       queryClient.invalidateQueries({ queryKey: ['/api/staff-branches'] });
     },
     onError: (error) => {
+      console.error('Remove mutation error:', error);
       toast({
         title: "Error",
         description: "Failed to remove assignment. Please try again.",
@@ -161,10 +193,25 @@ export default function StaffAssignmentsPage() {
   // Toggle manager status mutation
   const toggleManagerMutation = useMutation({
     mutationFn: async ({ id, isManager }: { id: number, isManager: boolean }) => {
-      return await apiRequest(`/api/staff-branches/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ isManager }),
-      });
+      try {
+        const response = await fetch(`/api/staff-branches/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ isManager }),
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to update manager status');
+        }
+        
+        return await response.json();
+      } catch (error) {
+        console.error('Toggle manager error:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({
@@ -174,6 +221,7 @@ export default function StaffAssignmentsPage() {
       queryClient.invalidateQueries({ queryKey: ['/api/staff-branches'] });
     },
     onError: (error) => {
+      console.error('Toggle mutation error:', error);
       toast({
         title: "Error",
         description: "Failed to update status. Please try again.",
