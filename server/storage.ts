@@ -383,6 +383,10 @@ export class MemStorage implements IStorage {
   async getChildrenByParent(parentId: number): Promise<Child[]> {
     return Array.from(this.children.values()).filter(child => child.parentId === parentId);
   }
+  
+  async getAllChildren(): Promise<Child[]> {
+    return Array.from(this.children.values());
+  }
 
   async getChild(id: number): Promise<Child | undefined> {
     return this.children.get(id);
@@ -432,6 +436,10 @@ export class MemStorage implements IStorage {
   // Classes
   async getClassesByBranch(branchId: number): Promise<Class[]> {
     return Array.from(this.classes.values()).filter(cls => cls.branchId === branchId);
+  }
+  
+  async getAllClasses(): Promise<Class[]> {
+    return Array.from(this.classes.values());
   }
 
   async getClass(id: number): Promise<Class | undefined> {

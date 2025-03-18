@@ -46,6 +46,16 @@ export function calculateChildAge(dateOfBirth: Date): number {
   return age;
 }
 
+export function getAgeGroup(age: number): string {
+  if (age < 1) {
+    return 'infant';
+  } else if (age >= 1 && age < 3) {
+    return 'toddler';
+  } else {
+    return 'children';
+  }
+}
+
 export function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + '...';

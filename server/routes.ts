@@ -432,6 +432,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+  
+  // Get all schedule slots
+  app.get('/api/slots', async (req, res, next) => {
+    try {
+      // For a real system, we would implement pagination here
+      // Get all schedule slots from all classes
+      const classes = await storage.getAllClasses();
+      const allSlots = [];
+      
+      for (const klass of classes) {
+        const slots = await storage.getSlotsByClass(klass.id);
+        allSlots.push(...slots);
+      }
+      
+      res.json(allSlots);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   app.post('/api/slots', hasRole([Role.ADMIN, Role.STAFF]), async (req, res, next) => {
     try {
@@ -463,6 +482,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const appointments = await storage.getAppointmentsByChild(childId);
       res.json(appointments);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Get all appointments
+  app.get('/api/appointments', hasRole([Role.STAFF, Role.ADMIN]), async (req, res, next) => {
+    try {
+      // For a real system, we would implement pagination, filtering by date range, etc.
+      // Get all appointments from storage
+      const allAppointments = [];
+      
+      // Find appointments from all children
+      const children = await storage.getAllChildren();
+      
+      for (const child of children) {
+        const childAppointments = await storage.getAppointmentsByChild(child.id);
+        allAppointments.push(...childAppointments);
+      }
+      
+      res.json(allAppointments);
     } catch (error) {
       next(error);
     }
