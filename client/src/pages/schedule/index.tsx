@@ -498,19 +498,19 @@ export default function SchedulePage() {
                               }) ? (
                                 classes.map((cls: any) => {
                                   // Get slots for this class on this day
-                                  const classSlots = scheduleSlots?.filter((slot: any) => 
+                                  const classSlots = Array.isArray(scheduleSlots) ? scheduleSlots.filter((slot: any) => 
                                     slot.classId === cls.id && slot.dayOfWeek === index + 1
-                                  ) || [];
+                                  ) : [];
                                   
                                   return classSlots.length > 0 ? (
                                     classSlots.map((slot: any) => {
                                       // Count children in each age group for this slot
-                                      const slotAppointments = appointments?.filter((app: any) => 
+                                      const slotAppointments = Array.isArray(appointments) ? appointments.filter((app: any) => 
                                         app.slotId === slot.id
-                                      ) || [];
+                                      ) : [];
                                       
                                       const childrenInSlot = slotAppointments.map((app: any) => {
-                                        const child = children?.find((c: any) => c.id === app.childId);
+                                        const child = Array.isArray(children) ? children.find((c: any) => c.id === app.childId) : null;
                                         return child;
                                       }).filter(Boolean);
                                       
@@ -599,7 +599,7 @@ export default function SchedulePage() {
                     <div className="flex justify-center p-12">
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
-                  ) : children && children.length > 0 ? (
+                  ) : children && Array.isArray(children) && children.length > 0 ? (
                     <div className="space-y-6">
                       {children.map((child: any) => (
                         <Card key={child.id}>
@@ -690,7 +690,7 @@ export default function SchedulePage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {children?.map((child: any) => (
+                            {Array.isArray(children) && children.map((child: any) => (
                               <SelectItem key={child.id} value={child.id.toString()}>
                                 {child.firstName} {child.lastName} ({calculateChildAge(new Date(child.dateOfBirth))} years)
                               </SelectItem>
