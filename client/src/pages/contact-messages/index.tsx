@@ -29,8 +29,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import Header from "@/components/layout/Header";
-import Sidebar from "@/components/layout/Sidebar";
+import { useLocation } from "wouter";
 import {
   Mail,
   Eye,
@@ -43,6 +42,7 @@ import {
   RefreshCw,
   Loader2,
   Download,
+  ArrowLeft,
 } from "lucide-react";
 import {
   Select,
@@ -62,6 +62,7 @@ export default function ContactMessagesPage() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   // Fetch contact messages
   const { data: messages, isLoading: loadingMessages } = useQuery({
@@ -168,187 +169,138 @@ export default function ContactMessagesPage() {
   const readMessages = messages ? messages.filter((message: any) => message.isRead).length : 0;
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <div className="flex-1">
-        <Header />
-        <main className="flex-1 space-y-6 p-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Contact Messages</h1>
-            <Button variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/contact-messages'] })}>
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Refresh
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Total</p>
-                  <p className="text-2xl font-bold">{totalMessages}</p>
-                </div>
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Mail className="h-5 w-5 text-blue-600" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Unread</p>
-                  <p className="text-2xl font-bold">{unreadMessages}</p>
-                </div>
-                <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
-                  <Mail className="h-5 w-5 text-amber-600" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Read</p>
-                  <p className="text-2xl font-bold">{readMessages}</p>
-                </div>
-                <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Messages</CardTitle>
-              <CardDescription>
-                View and manage contact form submissions from visitors
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search messages..."
-                    className="pl-8"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <div className="w-full md:w-64">
-                  <Select
-                    value={filterStatus}
-                    onValueChange={(value: "all" | "read" | "unread") => setFilterStatus(value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Messages</SelectItem>
-                      <SelectItem value="read">Read</SelectItem>
-                      <SelectItem value="unread">Unread</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Button variant="outline" onClick={toggleSortOrder}>
-                    {sortOrder === "asc" ? (
-                      <>
-                        <SortAsc className="mr-2 h-4 w-4" />
-                        Oldest First
-                      </>
-                    ) : (
-                      <>
-                        <SortDesc className="mr-2 h-4 w-4" />
-                        Newest First
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              {loadingMessages ? (
-                <div className="flex justify-center py-10">
-                  <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                </div>
-              ) : (
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[4%]"></TableHead>
-                        <TableHead className="w-[20%]">From</TableHead>
-                        <TableHead className="w-[25%]">Subject</TableHead>
-                        <TableHead className="w-[35%]">Message Preview</TableHead>
-                        <TableHead className="w-[11%]">Date</TableHead>
-                        <TableHead className="w-[5%]"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredMessages.length > 0 ? (
-                        filteredMessages.map((message: any) => (
-                          <TableRow 
-                            key={message.id} 
-                            className={message.isRead ? "" : "bg-blue-50/50"}
-                          >
-                            <TableCell>
-                              {!message.isRead && (
-                                <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <div className="font-medium">{message.name}</div>
-                              <div className="text-xs text-gray-500">{message.email}</div>
-                            </TableCell>
-                            <TableCell>
-                              {message.subject}
-                            </TableCell>
-                            <TableCell>
-                              <div className="truncate text-gray-500">
-                                {message.message.substring(0, 100)}
-                                {message.message.length > 100 ? "..." : ""}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="text-sm text-gray-500">
-                                {formatDate(new Date(message.createdAt))}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleViewMessage(message)}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={6} className="text-center py-6">
-                            No messages found. Try adjusting your filters.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <div className="text-sm text-gray-500">
-                {filteredMessages ? filteredMessages.length : 0} messages found
-              </div>
-              <Button variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Export Messages
-              </Button>
-            </CardFooter>
-          </Card>
-        </main>
+    <div className="container py-10">
+      <div className="mb-6">
+        <Button variant="ghost" onClick={() => setLocation("/dashboard")} className="gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          Back to Dashboard
+        </Button>
       </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Contact Messages</CardTitle>
+          <CardDescription>
+            View and manage contact form submissions
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search messages..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="w-full md:w-auto flex gap-2">
+              <Select
+                value={filterStatus}
+                onValueChange={(value: "all" | "read" | "unread") => setFilterStatus(value)}
+              >
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue placeholder="Filter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Messages</SelectItem>
+                  <SelectItem value="read">Read</SelectItem>
+                  <SelectItem value="unread">Unread</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Button variant="outline" size="icon" onClick={toggleSortOrder}>
+                {sortOrder === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/contact-messages'] })}
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {loadingMessages ? (
+            <div className="flex justify-center py-10">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[4%]"></TableHead>
+                    <TableHead className="w-[20%]">From</TableHead>
+                    <TableHead className="w-[20%]">Subject</TableHead>
+                    <TableHead className="w-[41%]">Message Preview</TableHead>
+                    <TableHead className="w-[10%]">Date</TableHead>
+                    <TableHead className="w-[5%]"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredMessages.length > 0 ? (
+                    filteredMessages.map((message: any) => (
+                      <TableRow 
+                        key={message.id} 
+                        className={message.isRead ? "" : "bg-blue-50/50"}
+                      >
+                        <TableCell>
+                          {!message.isRead && (
+                            <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-medium">{message.name}</div>
+                          <div className="text-xs text-gray-500">{message.email}</div>
+                        </TableCell>
+                        <TableCell>
+                          {message.subject}
+                        </TableCell>
+                        <TableCell>
+                          <div className="truncate text-gray-500">
+                            {message.message.substring(0, 100)}
+                            {message.message.length > 100 ? "..." : ""}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm text-gray-500">
+                            {formatDate(new Date(message.createdAt))}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleViewMessage(message)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-6">
+                        No messages found. Try adjusting your filters.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+          
+          <div className="flex justify-between items-center mt-4">
+            <div className="text-sm text-muted-foreground">
+              {filteredMessages.length} messages {filterStatus !== "all" ? `(${filterStatus})` : ""}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* View Message Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>

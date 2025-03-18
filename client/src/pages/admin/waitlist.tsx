@@ -21,8 +21,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
-import { Eye, Download } from "lucide-react";
-import AdminMenu from "@/components/dashboard/AdminMenu";
+import { Eye, Download, ArrowLeft } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface WaitlistEntry {
   id: number;
@@ -42,9 +42,8 @@ interface WaitlistEntry {
 
 export default function AdminWaitlistPage() {
   const { toast } = useToast();
-  const [selectedEntry, setSelectedEntry] = useState<WaitlistEntry | null>(
-    null,
-  );
+  const [selectedEntry, setSelectedEntry] = useState<WaitlistEntry | null>(null);
+  const [, setLocation] = useLocation();
 
   const {
     data: waitlistEntries,
@@ -121,8 +120,13 @@ export default function AdminWaitlistPage() {
   if (isLoading) {
     return (
       <div className="container py-10">
-        <AdminMenu />
-        <Card className="mt-6">
+        <div className="mb-6">
+          <Button variant="ghost" onClick={() => setLocation("/dashboard")} className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
+        <Card>
           <CardHeader>
             <CardTitle>Waitlist Entries</CardTitle>
             <CardDescription>Loading waitlist data...</CardDescription>
@@ -140,8 +144,13 @@ export default function AdminWaitlistPage() {
   if (error) {
     return (
       <div className="container py-10">
-        <AdminMenu />
-        <Card className="mt-6">
+        <div className="mb-6">
+          <Button variant="ghost" onClick={() => setLocation("/dashboard")} className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
+        <Card>
           <CardHeader>
             <CardTitle>Waitlist Entries</CardTitle>
             <CardDescription className="text-destructive">
@@ -161,9 +170,14 @@ export default function AdminWaitlistPage() {
 
   return (
     <div className="container py-10">
-      <AdminMenu />
+      <div className="mb-6">
+        <Button variant="ghost" onClick={() => setLocation("/dashboard")} className="gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          Back to Dashboard
+        </Button>
+      </div>
 
-      <Card className="mt-6">
+      <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Waitlist Entries</CardTitle>
