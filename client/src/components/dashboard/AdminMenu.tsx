@@ -58,6 +58,12 @@ export default function AdminMenu() {
       href: "/staff-assignments",
     },
     {
+      title: "Enrollment Requests",
+      description: "Families requesting a daycare spot",
+      icon: <Award className="h-8 w-8 text-rose-500" />,
+      href: "/admin/inquiries",
+    },
+    {
       title: "Waitlist Entries",
       description: "Review and manage waitlist sign-ups",
       icon: <ClipboardList className="h-8 w-8 text-purple-500" />,

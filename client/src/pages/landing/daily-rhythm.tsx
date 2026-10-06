@@ -13,7 +13,7 @@ export default function DailyRhythm() {
             <Sparkle className="h-8 w-8 text-kv-sun" />
             <h2 className="mt-4 font-display text-4xl font-bold md:text-5xl">A day at Kid‑Venture</h2>
             <p className="mt-4 font-body text-lg leading-relaxed text-white/75">
-              Children thrive on rhythm. Our days flow between busy and calm, together and independent, indoors and out —
+              Children thrive on rhythm. Our days flow between busy and calm, together and independent, indoors and out,
               so every child feels secure and ready to explore.
             </p>
           </div>

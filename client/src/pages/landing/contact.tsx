@@ -18,7 +18,7 @@ export default function Contact() {
         <div className="text-kv-ink">
           <h2 className="font-display text-4xl font-bold md:text-5xl">Say hello 👋</h2>
           <p className="mt-4 max-w-md font-body text-lg text-kv-ink/80">
-            Questions about care, schedules or anything else? We'd love to hear from you and usually reply within a day.
+            Have a quick question before filling out the request form? Send a note and we'll get back to you within a day.
           </p>
           <ul className="mt-10 space-y-5">
             {details.map(({ icon: Icon, label, value, href }) => (

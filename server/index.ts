@@ -3,7 +3,9 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
-app.use(express.json());
+// Behind a hosting proxy (Render, Railway, Fly...) so req.ip is the visitor's IP
+app.set("trust proxy", 1);
+app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
@@ -56,10 +58,8 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
+  // Serves both the API and the client. Most hosts provide PORT; default 5000.
+  const port = Number(process.env.PORT) || 5000;
   server.listen({
     port,
     host: "0.0.0.0",

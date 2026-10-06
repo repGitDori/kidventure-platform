@@ -9,11 +9,11 @@ export default function Footer() {
           <Logo className="h-10 w-10" />
           <div>
             <p className="font-display text-xl font-bold">{site.name}</p>
-            <p className="font-body text-sm text-white/60">{site.tagline}</p>
+            <p className="font-body text-sm text-white/60">In-home daycare · {site.area}, UT</p>
           </div>
         </div>
         <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 font-body text-white/75" aria-label="Footer">
-          <a href="#programs" className="hover:text-kv-sun">Programs</a>
+          <a href="#learning" className="hover:text-kv-sun">Learning</a>
           <a href="#our-day" className="hover:text-kv-sun">Our Day</a>
           <a href="#about" className="hover:text-kv-sun">About</a>
           <a href="#faq" className="hover:text-kv-sun">FAQ</a>

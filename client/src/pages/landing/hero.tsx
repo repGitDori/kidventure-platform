@@ -28,16 +28,16 @@ export default function Hero() {
 
           <div className="mt-10 flex flex-col gap-4 sm:flex-row">
             <a
-              href="#waitlist"
+              href="#enroll"
               className="rounded-full bg-kv-coral px-8 py-4 text-center font-display text-xl font-semibold text-white shadow-[0_5px_0_#C9573A] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none"
             >
-              Join the interest list
+              Request a spot
             </a>
             <a
-              href="#programs"
+              href="#about"
               className="rounded-full border-2 border-kv-ink bg-white px-8 py-4 text-center font-display text-xl font-semibold text-kv-ink transition-colors hover:bg-kv-ink hover:text-white"
             >
-              Explore programs
+              Meet your provider
             </a>
           </div>
         </div>
@@ -45,13 +45,13 @@ export default function Hero() {
         <div className="relative">
           <HeroIllustration className="w-full" />
           <div className="absolute -left-2 top-6 rotate-[-6deg] animate-float rounded-2xl bg-white px-4 py-2 font-display font-semibold text-kv-ink shadow-lg sm:left-0">
-            🎨 Play-based learning
+            🎓 Degreed educator
           </div>
           <div
             className="absolute -bottom-3 right-0 rotate-[5deg] animate-float rounded-2xl bg-kv-sun px-4 py-2 font-display font-semibold text-kv-ink shadow-lg sm:bottom-8 sm:right-2"
             style={{ animationDelay: "1.5s" }}
           >
-            🌱 Outdoors every day
+            🏡 Only a few spots
           </div>
         </div>
       </div>

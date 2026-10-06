@@ -4,98 +4,105 @@
 export const site = {
   name: "Kid-Venture",
   tagline: "Play. Explore. Grow.",
-  city: "[Your City]",
+  area: "Lehi & American Fork",
+  region: "Utah County, Utah",
   email: "hello@kid-venture.com",
-  phone: "[(555) 123-4567]",
-  address: "[Street address, City, State]",
-  hours: "Monday – Friday, 7:00 am – 6:00 pm",
+  phone: "[(801) 555-1234]",
+  // For privacy, the home address is only shared with families after they get in touch.
+  address: "In-home daycare serving Lehi & American Fork — address shared when we schedule your visit",
+  hours: "Monday – Friday, [7:30 am – 5:30 pm]",
 };
 
 export const hero = {
-  badge: `Opening soon in ${site.city}`,
-  titleStart: "Little explorers,",
-  titleHighlight: "big adventures",
+  badge: `In-home daycare · ${site.area} · Limited spots`,
+  titleStart: "A cozy home for",
+  titleHighlight: "little explorers",
   description:
-    "Kid-Venture is a small, home-hearted daycare where curiosity leads the way. Children learn through play, nature and lots of laughter — and parents get peace of mind every single day.",
+    "Kid-Venture is a small, in-home daycare in Utah County run by a mom of two with a bachelor's degree in childhood education and years of experience leading a daycare. Just a few spots, so every child gets real attention, real learning and lots of love.",
 };
 
 export const promises = [
-  { title: "Small groups", text: "Low child-to-teacher ratios so every child is truly seen." },
-  { title: "Safety first", text: "Secure check-in, a childproofed space and clear daily routines." },
-  { title: "Healthy food", text: "Nutritious meals and snacks, with allergies taken seriously." },
-  { title: "Daily updates", text: "Photos and notes about naps, meals and milestones." },
+  { title: "Degreed educator", text: "A bachelor's in childhood education behind every activity and routine." },
+  { title: "Proven experience", text: "Formerly managed a daycare and led a team of six caregivers." },
+  { title: "A tiny group", text: "Only a few children join my own two, so no one gets lost in the crowd." },
+  { title: "Home, not a center", text: "A warm, family setting with daily photos and updates for you." },
 ];
 
 export const programs = [
   {
-    name: "Little Sprouts",
-    ages: "6 weeks – 12 months",
+    name: "Play & Discovery",
+    tag: "Hands-on",
     color: "sage",
     description:
-      "Cuddles, tummy time and gentle sensory play, following each baby's own rhythm for feeding and naps.",
-    highlights: ["Personal daily schedules", "Sensory exploration", "Lots of one-on-one care"],
+      "Children learn best by doing. Sensory bins, building, pretend play and time outdoors spark curiosity every day.",
+    highlights: ["Outdoor & nature play", "Arts, crafts & messy fun", "Music & movement"],
   },
   {
-    name: "Busy Explorers",
-    ages: "1 – 2 years",
+    name: "Early Learning",
+    tag: "School-ready",
     color: "sun",
     description:
-      "Wobbly first steps turn into big discoveries — music, movement, messy art and first words.",
-    highlights: ["Music & movement", "Early language games", "Outdoor play every day"],
+      "Gentle, play-based lessons planned with an educator's eye, matched to each child's age and stage.",
+    highlights: ["Letters & early reading", "Numbers & counting", "Kindergarten readiness"],
   },
   {
-    name: "Curious Minds",
-    ages: "3 – 5 years",
+    name: "Heart & Character",
+    tag: "Kind & confident",
     color: "coral",
     description:
-      "Play-based preschool that builds kindergarten readiness: letters, numbers, friendship and confidence.",
-    highlights: ["Pre-reading & early math", "Science & nature projects", "Social-emotional skills"],
+      "In a small, family-style group, children practice sharing, taking turns, naming feelings and helping each other.",
+    highlights: ["Friendship & social skills", "Feelings & self-regulation", "Healthy routines"],
   },
 ] as const;
 
 export const dailyRhythm = [
-  { time: "7:00", title: "Warm welcome", text: "Free play and a cozy hello while families drop off." },
-  { time: "9:00", title: "Circle time", text: "Songs, stories and our question of the day." },
-  { time: "10:00", title: "Outdoor adventure", text: "Fresh air, digging, climbing and nature walks." },
-  { time: "11:30", title: "Lunch & rest", text: "A healthy meal together, then quiet nap time." },
-  { time: "2:30", title: "Creative studio", text: "Painting, building, pretend play and sensory bins." },
-  { time: "4:30", title: "Wind down", text: "Puzzles, books and a happy hand-off at pickup." },
+  { time: "7:30", title: "Warm welcome", text: "Breakfast, free play and a cozy hello while families drop off." },
+  { time: "9:00", title: "Circle time", text: "Songs, stories, the calendar and our question of the day." },
+  { time: "9:30", title: "Learning centers", text: "Short, playful lessons in letters, numbers and discovery." },
+  { time: "10:30", title: "Outdoor adventure", text: "Backyard play, walks to the park and nature hunts." },
+  { time: "12:00", title: "Lunch & rest", text: "A healthy lunch together, then quiet nap or rest time." },
+  { time: "3:00", title: "Create & wind down", text: "Art, building, puzzles and books until pickup." },
 ];
 
 export const founderNote = {
-  title: "A note from our founder",
+  title: "Hi, I'm so glad you're here",
   paragraphs: [
-    "Kid-Venture started as a dream at our own kitchen table: a place where children feel as safe and loved as they do at home, while discovering something new every day.",
-    "We believe the early years are made for wonder — muddy boots, block towers and endless “why?” questions. Our job is to protect that curiosity and give it room to grow.",
-    "We can't wait to meet your family.",
+    "I'm a mom of two and I have a bachelor's degree in childhood education. Before staying home with my own kids, I managed a daycare and led a team of six caregivers. I loved helping children grow, and I loved helping parents feel at ease.",
+    "Now I'm opening my home in the Lehi / American Fork area to a few more children. My goal is simple: to give your child the same care, structure and fun learning I give my own kids, in a setting that feels like family.",
+    "Because the group is small, spots are limited. Tell me a little about your family below and I'll reach out personally.",
   ],
-  signature: "— The Kid-Venture family",
+  signature: "— [Your name], founder of Kid-Venture",
 };
 
 export const faqs = [
   {
-    question: "When will Kid-Venture open?",
+    question: "Where are you located?",
     answer:
-      "We're getting everything ready now. Join the interest list and you'll be the first to hear about our opening date, tours and enrollment.",
+      "Kid-Venture is an in-home daycare serving families in Lehi and American Fork (Utah County). For the safety of the children, we share the exact address when we schedule your visit.",
+  },
+  {
+    question: "How many spots are available?",
+    answer:
+      "Just a few. Keeping the group small is what makes home daycare special, so spots fill up quickly. Fill out the request form to be considered.",
   },
   {
     question: "What ages do you care for?",
     answer:
-      "We plan to welcome children from 6 weeks to 5 years old, grouped into Little Sprouts, Busy Explorers and Curious Minds.",
+      "Add your child's birthdate in the request form and we'll let you know if we have a good fit for their age. Small, mixed-age groups help little ones learn from each other.",
   },
   {
-    question: "What does a typical day look like?",
+    question: "How much does it cost?",
     answer:
-      "Our days balance active and quiet time: circle time, outdoor play, healthy meals, naps and creative projects. See “A day at Kid‑Venture” above for the full rhythm.",
+      "Tuition depends on your child's age and how many days you need. Share your budget in the form and we'll talk through options that work for your family.",
   },
   {
-    question: "Will I get updates during the day?",
+    question: "What will my child learn?",
     answer:
-      "Yes! Parents receive photos and short notes about meals, naps, activities and milestones, plus a secure parent portal to keep everything in one place.",
+      "Every day mixes play-based lessons (letters, numbers, science), outdoor time, art and music, plus social skills like sharing and naming feelings. You can tell us which topics matter most to you in the form.",
   },
   {
     question: "Can I visit before enrolling?",
     answer:
-      "Absolutely. Once we open, we'll offer tours so you can see the space and meet the team. Join the interest list and we'll reach out to schedule one.",
+      "Yes, please do! After you send your request, we'll reach out to set up a visit so you can see the space and meet us.",
   },
 ];

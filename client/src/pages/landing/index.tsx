@@ -4,7 +4,7 @@ import Hero from "@/pages/landing/hero";
 import Programs from "@/pages/landing/programs";
 import DailyRhythm from "@/pages/landing/daily-rhythm";
 import Founder from "@/pages/landing/founder";
-import Waitlist from "@/pages/landing/waitlist";
+import Enroll from "@/pages/landing/enroll";
 import FAQ from "@/pages/landing/faq";
 import Contact from "@/pages/landing/contact";
 import Footer from "@/pages/landing/footer";
@@ -40,7 +40,7 @@ export default function LandingPage() {
         <Programs />
         <DailyRhythm />
         <Founder />
-        <Waitlist />
+        <Enroll />
         <FAQ />
         <Contact />
       </main>

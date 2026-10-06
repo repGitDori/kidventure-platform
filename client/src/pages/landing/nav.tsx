@@ -6,7 +6,7 @@ import { site } from "./content";
 import { Logo } from "./doodles";
 
 const links = [
-  { href: "#programs", label: "Programs" },
+  { href: "#learning", label: "Learning" },
   { href: "#our-day", label: "Our Day" },
   { href: "#about", label: "About" },
   { href: "#faq", label: "FAQ" },
@@ -57,10 +57,10 @@ export default function Nav() {
             {user ? "Parent portal" : "Log in"}
           </Link>
           <a
-            href="#waitlist"
+            href="#enroll"
             className="rounded-full bg-kv-coral px-6 py-3 font-display text-lg font-semibold text-white shadow-[0_4px_0_#C9573A] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none"
           >
-            Join the list
+            Request a spot
           </a>
         </div>
 
@@ -96,11 +96,11 @@ export default function Nav() {
             </Link>
           </nav>
           <a
-            href="#waitlist"
+            href="#enroll"
             onClick={() => setOpen(false)}
             className="mt-2 block rounded-full bg-kv-coral px-6 py-3 text-center font-display text-lg font-semibold text-white"
           >
-            Join the interest list
+            Request a spot
           </a>
         </div>
       )}

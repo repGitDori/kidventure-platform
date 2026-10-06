@@ -10,14 +10,14 @@ const palette = {
 
 export default function Programs() {
   return (
-    <section id="programs" className="relative bg-white">
+    <section id="learning" className="relative bg-white">
       <Wave className="-mt-px text-kv-cream" flip />
       <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
         <div className="mx-auto max-w-2xl text-center">
           <Squiggle className="mx-auto mb-4 h-4 w-24 text-kv-coral" />
-          <h2 className="font-display text-4xl font-bold text-kv-ink md:text-5xl">Programs for every little stage</h2>
+          <h2 className="font-display text-4xl font-bold text-kv-ink md:text-5xl">What we learn together</h2>
           <p className="mt-4 font-body text-lg text-kv-inkSoft">
-            Each group has its own cozy space, routines and activities designed for where your child is right now.
+            A balanced day of play, early learning and character building, planned by a degreed educator and adapted to each child.
           </p>
         </div>
 
@@ -34,7 +34,7 @@ export default function Programs() {
                 <div className="flex items-start justify-between">
                   <ProgramIcon variant={program.color} className="h-16 w-16" />
                   <span className={`${c.chip} rounded-full px-3 py-1 font-body text-xs font-bold uppercase tracking-wide text-white`}>
-                    {program.ages}
+                    {program.tag}
                   </span>
                 </div>
                 <h3 className="mt-6 font-display text-2xl font-bold text-kv-ink">{program.name}</h3>
