@@ -12,6 +12,7 @@ import {
   scheduleOptions,
   type InquiryInput,
 } from "@shared/inquiry";
+import { sendInquiry } from "@/lib/submit-form";
 
 const inputClass =
   "w-full rounded-2xl border-2 border-kv-sand bg-white px-4 py-3 font-body text-base text-kv-ink placeholder:text-kv-inkSoft/50 outline-none transition focus:border-kv-coral focus:ring-4 focus:ring-kv-coral/15";
@@ -130,15 +131,7 @@ export default function EnrollForm() {
   const onSubmit = async (data: InquiryInput) => {
     setStatus("sending");
     try {
-      const res = await fetch("/api/inquiries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.message || "Something went wrong");
-      }
+      await sendInquiry(data);
       setStatus("sent");
       document.getElementById("enroll")?.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (error) {

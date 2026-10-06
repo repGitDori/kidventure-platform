@@ -1,13 +1,5 @@
-import {
-  budgetOptions,
-  cityOptions,
-  dayOptions,
-  focusTopicOptions,
-  heardFromOptions,
-  labelFor,
-  scheduleOptions,
-  type Inquiry,
-} from "@shared/inquiry";
+import { contactEmail, inquiryEmail, type EmailRows } from "@shared/form-emails";
+import type { Inquiry } from "@shared/inquiry";
 import type { ContactMessage } from "@shared/schema";
 import { log } from "./vite";
 
@@ -30,15 +22,7 @@ if (!process.env.RESEND_API_KEY) {
 const escape = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-function ageFrom(birthdate: string) {
-  const born = new Date(birthdate);
-  const months =
-    (new Date().getFullYear() - born.getFullYear()) * 12 + (new Date().getMonth() - born.getMonth());
-  if (months < 0) return "due " + birthdate;
-  return months < 24 ? `${months} mo` : `${Math.floor(months / 12)} yrs`;
-}
-
-async function send(subject: string, rows: [string, string][], replyTo: string) {
+async function send({ subject, rows }: { subject: string; rows: EmailRows }, replyTo: string) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return;
 
@@ -70,52 +54,9 @@ async function send(subject: string, rows: [string, string][], replyTo: string) 
 }
 
 export function notifyNewInquiry(inquiry: Inquiry) {
-  return send(
-    `New enrollment inquiry: ${inquiry.parentName}`,
-    [
-      ["Parent", inquiry.parentName],
-      ["Email", inquiry.email],
-      ["Phone", inquiry.phone],
-      ["City", labelFor(cityOptions, inquiry.city)],
-      [
-        "Children",
-        inquiry.children.map((c) => `${c.name || "Child"} (${ageFrom(c.birthdate)}, born ${c.birthdate})`).join("\n"),
-      ],
-      ["Start", inquiry.startDate],
-      [
-        "Schedule",
-        `${labelFor(scheduleOptions, inquiry.schedule)} – ${inquiry.days.map((d) => labelFor(dayOptions, d)).join(", ")}${
-          inquiry.hours ? ` (${inquiry.hours})` : ""
-        }`,
-      ],
-      ["Budget", labelFor(budgetOptions, inquiry.budget)],
-      ["Expecting", inquiry.expectations],
-      ["Focus topics", inquiry.focusTopics.map((t) => labelFor(focusTopicOptions, t)).join(", ")],
-      ["Other topics", inquiry.otherTopics],
-      ["Notes", inquiry.notes],
-      ["Heard from", inquiry.heardFrom ? labelFor(heardFromOptions, inquiry.heardFrom) : ""],
-    ],
-    inquiry.email,
-  );
+  return send(inquiryEmail(inquiry), inquiry.email);
 }
 
-const contactSubjects: Record<string, string> = {
-  general: "General question",
-  enrollment: "Enrollment & tours",
-  careers: "Working at Kid-Venture",
-  feedback: "Feedback",
-};
-
 export function notifyNewContactMessage(message: ContactMessage) {
-  const subject = contactSubjects[message.subject] ?? message.subject;
-  return send(
-    `New message from ${message.name}: ${subject}`,
-    [
-      ["Name", message.name],
-      ["Email", message.email],
-      ["Subject", subject],
-      ["Message", message.message],
-    ],
-    message.email,
-  );
+  return send(contactEmail(message), message.email);
 }

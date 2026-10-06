@@ -28,6 +28,8 @@ export default defineConfig({
       "@shared": path.resolve(__dirname, "shared"),
     },
   },
+  // GitHub Pages serves project sites from /<repo>/ until a custom domain is set
+  base: process.env.PAGES_BASE_PATH ? `${process.env.PAGES_BASE_PATH}/` : "/",
   root: path.resolve(__dirname, "client"),
   build: {
     outDir: path.resolve(__dirname, "dist/public"),

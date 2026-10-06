@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest } from "@/lib/queryClient";
+import { sendContactMessage } from "@/lib/submit-form";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,7 +49,7 @@ export default function ContactForm() {
     setIsSubmitting(true);
     
     try {
-      await apiRequest('POST', '/api/contact', data);
+      await sendContactMessage(data);
       
       toast({
         title: "Message sent successfully!",

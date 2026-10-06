@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { UserContext } from "@/App";
 import { site } from "./content";
 import { Logo } from "./doodles";
+import { isStaticSite } from "@/lib/submit-form";
 
 const links = [
   { href: "#learning", label: "Learning" },
@@ -50,12 +51,14 @@ export default function Nav() {
         </nav>
 
         <div className="hidden items-center gap-4 lg:flex">
-          <Link
-            href={user ? "/dashboard" : "/login"}
-            className="font-body font-semibold text-kv-inkSoft transition-colors hover:text-kv-coral"
-          >
-            {user ? "Parent portal" : "Log in"}
-          </Link>
+          {!isStaticSite && (
+            <Link
+              href={user ? "/dashboard" : "/login"}
+              className="font-body font-semibold text-kv-inkSoft transition-colors hover:text-kv-coral"
+            >
+              {user ? "Parent portal" : "Log in"}
+            </Link>
+          )}
           <a
             href="#enroll"
             className="rounded-full bg-kv-coral px-6 py-3 font-display text-lg font-semibold text-white shadow-[0_4px_0_#C9573A] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none"
@@ -88,12 +91,14 @@ export default function Nav() {
                 {link.label}
               </a>
             ))}
-            <Link
-              href={user ? "/dashboard" : "/login"}
-              className="rounded-xl px-3 py-3 font-body text-lg font-semibold text-kv-inkSoft hover:bg-kv-sand"
-            >
-              {user ? "Parent portal" : "Log in"}
-            </Link>
+            {!isStaticSite && (
+              <Link
+                href={user ? "/dashboard" : "/login"}
+                className="rounded-xl px-3 py-3 font-body text-lg font-semibold text-kv-inkSoft hover:bg-kv-sand"
+              >
+                {user ? "Parent portal" : "Log in"}
+              </Link>
+            )}
           </nav>
           <a
             href="#enroll"

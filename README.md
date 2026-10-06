@@ -21,7 +21,37 @@ npm run dev        # http://localhost:5000
 
 Log in as the admin user (`dorian`) to see submissions, update their status and export a CSV.
 
-## Deploying
+## Hosting on GitHub Pages (recommended, free)
+
+The public website is published as a static site by `.github/workflows/deploy-pages.yml`
+on every push to `main`. There is no server on GitHub Pages, so the two forms are sent
+through [Web3Forms](https://web3forms.com), which emails each submission
+(reply-to is the parent's address). The admin pages and logins are not part of the
+static site.
+
+1. **Form key:** go to [web3forms.com](https://web3forms.com), enter `databasemaestro@gmail.com`
+   and click *Create Access Key*. The key arrives by email.
+2. **Add the key:** repo **Settings → Secrets and variables → Actions → Variables → New repository variable**,
+   name `WEB3FORMS_KEY`, value = the key. (The key is public by design; it only allows sending to that inbox.)
+3. **Turn on Pages:** repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+4. **Publish:** merge into `main` (or run the workflow from the **Actions** tab).
+5. **Custom domain:** **Settings → Pages → Custom domain** = `kid-venture.com`, save, then tick **Enforce HTTPS**
+   once it's available.
+6. **DNS at GoDaddy** (My Products → kid-venture.com → DNS):
+
+   | Action | Type | Name | Value |
+   | --- | --- | --- | --- |
+   | Delete | A | `@` | `34.111.179.208` (old Replit) |
+   | Add | A | `@` | `185.199.108.153` |
+   | Add | A | `@` | `185.199.109.153` |
+   | Add | A | `@` | `185.199.110.153` |
+   | Add | A | `@` | `185.199.111.153` |
+   | Edit | CNAME | `www` | `repgitdori.github.io` |
+
+   Leave the `MX` record (Microsoft 365 email) and the `onmicrosoft.com` TXT record alone.
+   The `replit-verify` TXT record can be deleted.
+
+## Deploying the full app (server, admin pages, logins)
 
 ```bash
 npm run build
@@ -43,7 +73,7 @@ Set these environment variables on your host:
 The host must keep `DATA_DIR` between deploys/restarts (for example a Render or Railway persistent disk);
 otherwise submissions are lost when the server restarts.
 
-## Email alerts & DNS
+## Email alerts for the full app (Resend)
 
 Every "Request a spot" and contact submission is emailed to `NOTIFY_EMAIL`, with
 reply-to set to the parent so you can just hit **Reply**.
