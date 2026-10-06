@@ -3,6 +3,7 @@ import {
   cityOptions,
   dayOptions,
   focusTopicOptions,
+  heardFromOptions,
   labelFor,
   scheduleOptions,
   type Inquiry,
@@ -10,12 +11,21 @@ import {
 import type { ContactMessage } from "@shared/schema";
 import { log } from "./vite";
 
-// Optional email alerts for new form submissions, sent through Resend
-// (https://resend.com, free tier is plenty). Set these environment variables:
-//   RESEND_API_KEY  - API key from Resend
-//   NOTIFY_EMAIL    - where alerts go, e.g. your Gmail address
-//   NOTIFY_FROM     - verified sender, defaults to Resend's test sender
-// Without them, submissions are still saved and visible in the admin pages.
+// Email alerts for every form submission, sent through Resend
+// (https://resend.com, free tier is plenty). Environment variables:
+//   RESEND_API_KEY  - API key from Resend (required for emails to send)
+//   NOTIFY_EMAIL    - where alerts go (default: databasemaestro@gmail.com)
+//   NOTIFY_FROM     - sender; set to "Kid-Venture <forms@kid-venture.com>" once
+//                     kid-venture.com is verified in Resend. Until then Resend's
+//                     test sender only delivers to the Resend account's own email.
+// Submissions are always saved and visible in the admin pages either way.
+
+const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL || "databasemaestro@gmail.com";
+const NOTIFY_FROM = process.env.NOTIFY_FROM || "Kid-Venture <onboarding@resend.dev>";
+
+if (!process.env.RESEND_API_KEY) {
+  log("RESEND_API_KEY is not set: form submissions will be saved but not emailed");
+}
 
 const escape = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
@@ -30,8 +40,7 @@ function ageFrom(birthdate: string) {
 
 async function send(subject: string, rows: [string, string][], replyTo: string) {
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.NOTIFY_EMAIL;
-  if (!apiKey || !to) return;
+  if (!apiKey) return;
 
   const html = `<table cellpadding="6" style="font-family:sans-serif;font-size:14px">${rows
     .filter(([, v]) => v)
@@ -46,14 +55,15 @@ async function send(subject: string, rows: [string, string][], replyTo: string) 
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: process.env.NOTIFY_FROM || "Kid-Venture <onboarding@resend.dev>",
-        to: [to],
+        from: NOTIFY_FROM,
+        to: NOTIFY_EMAIL.split(",").map((e) => e.trim()),
         reply_to: replyTo,
         subject,
         html,
       }),
     });
     if (!res.ok) log(`email notification failed: ${res.status} ${await res.text()}`);
+    else log(`emailed "${subject}" to ${NOTIFY_EMAIL}`);
   } catch (error) {
     log(`email notification failed: ${error}`);
   }
@@ -83,19 +93,27 @@ export function notifyNewInquiry(inquiry: Inquiry) {
       ["Focus topics", inquiry.focusTopics.map((t) => labelFor(focusTopicOptions, t)).join(", ")],
       ["Other topics", inquiry.otherTopics],
       ["Notes", inquiry.notes],
-      ["Heard from", inquiry.heardFrom],
+      ["Heard from", inquiry.heardFrom ? labelFor(heardFromOptions, inquiry.heardFrom) : ""],
     ],
     inquiry.email,
   );
 }
 
+const contactSubjects: Record<string, string> = {
+  general: "General question",
+  enrollment: "Enrollment & tours",
+  careers: "Working at Kid-Venture",
+  feedback: "Feedback",
+};
+
 export function notifyNewContactMessage(message: ContactMessage) {
+  const subject = contactSubjects[message.subject] ?? message.subject;
   return send(
-    `New message from ${message.name}: ${message.subject}`,
+    `New message from ${message.name}: ${subject}`,
     [
       ["Name", message.name],
       ["Email", message.email],
-      ["Subject", message.subject],
+      ["Subject", subject],
       ["Message", message.message],
     ],
     message.email,
