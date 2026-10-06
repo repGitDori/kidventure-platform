@@ -1,51 +1,80 @@
-import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
+import { hero, promises } from "./content";
+import { HeroIllustration, Scribble, Sparkle } from "./doodles";
 
 export default function Hero() {
   return (
-    <section className="py-12 md:py-20 px-4">
-      <div className="container mx-auto flex flex-col md:flex-row items-center">
-        <div className="md:w-1/2 mb-8 md:mb-0 md:pr-10">
-          <h1 className="font-heading font-bold text-4xl md:text-5xl text-gray-800 leading-tight mb-4">
-            Where Learning 
-            <span className="text-primary"> Adventures</span> 
-            Begin
+    <section id="top" className="relative overflow-hidden bg-kv-cream">
+      <Sparkle className="absolute left-[6%] top-16 hidden h-6 w-6 text-kv-sun md:block" />
+      <Sparkle className="absolute right-[45%] top-10 hidden h-4 w-4 text-kv-sky md:block" />
+
+      <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-10 md:grid-cols-2 md:pb-24 md:pt-16">
+        <div>
+          <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 font-body text-sm font-bold text-kv-sageDark shadow-sm ring-1 ring-kv-sand">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-kv-sage" />
+            {hero.badge}
+          </span>
+
+          <h1 className="mt-6 font-display text-5xl font-bold leading-[1.05] text-kv-ink sm:text-6xl lg:text-7xl">
+            {hero.titleStart}{" "}
+            <span className="relative inline-block text-kv-coral">
+              {hero.titleHighlight}
+              <Scribble className="absolute -bottom-3 left-0 h-4 w-full text-kv-sun" />
+            </span>
           </h1>
-          <p className="text-lg text-gray-600 mb-8">
-            KidVenture helps children learn through play with our innovative educational platform. Join our waitlist to be the first to experience our exciting new approach to learning!
+
+          <p className="mt-8 max-w-xl font-body text-lg leading-relaxed text-kv-inkSoft md:text-xl">
+            {hero.description}
           </p>
-          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <a 
-              href="#waitlist" 
-              className="inline-block px-8 py-4 bg-primary hover:bg-primary-dark text-white font-heading font-semibold text-lg rounded-xl shadow-lg transition-all transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+            <a
+              href="#waitlist"
+              className="rounded-full bg-kv-coral px-8 py-4 text-center font-display text-xl font-semibold text-white shadow-[0_5px_0_#C9573A] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none"
             >
-              Join Waitlist
+              Join the interest list
             </a>
-            <a 
-              href="#features" 
-              className="inline-block px-8 py-4 bg-white border-2 border-primary text-primary font-heading font-semibold text-lg rounded-xl shadow-md hover:bg-primary-light hover:text-white transition-all transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+            <a
+              href="#programs"
+              className="rounded-full border-2 border-kv-ink bg-white px-8 py-4 text-center font-display text-xl font-semibold text-kv-ink transition-colors hover:bg-kv-ink hover:text-white"
             >
-              Learn More
+              Explore programs
             </a>
           </div>
         </div>
-        <div className="md:w-1/2">
-          <div className="relative">
-            <img 
-              src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=600&h=500" 
-              alt="Children learning together" 
-              className="rounded-3xl shadow-xl"
-              width="600"
-              height="500"
-            />
-            <div className="absolute -top-4 -right-4 bg-amber-500 text-white text-sm font-heading font-bold px-4 py-2 rounded-xl rotate-3 shadow-md">
-              Coming Soon!
-            </div>
-            <div className="animate-bounce-slow absolute -bottom-6 -left-6 bg-purple-300 text-purple-800 text-sm font-heading font-bold px-4 py-2 rounded-xl -rotate-2 shadow-md">
-              Early Access Available!
-            </div>
+
+        <div className="relative">
+          <HeroIllustration className="w-full" />
+          <div className="absolute -left-2 top-6 rotate-[-6deg] animate-float rounded-2xl bg-white px-4 py-2 font-display font-semibold text-kv-ink shadow-lg sm:left-0">
+            🎨 Play-based learning
+          </div>
+          <div
+            className="absolute -bottom-3 right-0 rotate-[5deg] animate-float rounded-2xl bg-kv-sun px-4 py-2 font-display font-semibold text-kv-ink shadow-lg sm:bottom-8 sm:right-2"
+            style={{ animationDelay: "1.5s" }}
+          >
+            🌱 Outdoors every day
           </div>
         </div>
+      </div>
+
+      {/* promise strip */}
+      <div className="mx-auto max-w-6xl px-4 pb-16">
+        <ul className="grid gap-4 rounded-[2rem] bg-white p-6 shadow-[0_20px_50px_-30px_rgba(46,42,59,0.35)] ring-1 ring-kv-sand sm:grid-cols-2 lg:grid-cols-4 lg:p-8">
+          {promises.map((p, i) => (
+            <li key={p.title} className="flex gap-3">
+              <span
+                className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-display text-lg font-bold text-white ${
+                  ["bg-kv-sage", "bg-kv-sky", "bg-kv-sun", "bg-kv-lilac"][i % 4]
+                }`}
+              >
+                {i + 1}
+              </span>
+              <div>
+                <h2 className="font-display text-lg font-semibold text-kv-ink">{p.title}</h2>
+                <p className="font-body text-sm leading-relaxed text-kv-inkSoft">{p.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

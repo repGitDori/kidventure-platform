@@ -1,53 +1,50 @@
 import { useEffect } from "react";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import Nav from "@/pages/landing/nav";
 import Hero from "@/pages/landing/hero";
-import Features from "@/pages/landing/features";
-import Roles from "@/pages/landing/roles";
+import Programs from "@/pages/landing/programs";
+import DailyRhythm from "@/pages/landing/daily-rhythm";
+import Founder from "@/pages/landing/founder";
 import Waitlist from "@/pages/landing/waitlist";
 import FAQ from "@/pages/landing/faq";
 import Contact from "@/pages/landing/contact";
+import Footer from "@/pages/landing/footer";
 
 export default function LandingPage() {
-  // Smooth scrolling for anchor links
+  // Smooth scrolling for in-page anchor links, offset for the fixed header
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'A' && target.getAttribute('href')?.startsWith('#')) {
-        e.preventDefault();
-        
-        const targetId = target.getAttribute('href');
-        if (targetId === '#') return;
-        
-        const targetElement = document.querySelector(targetId || '');
-        if (targetElement) {
-          window.scrollTo({
-            top: targetElement.getBoundingClientRect().top + window.scrollY - 80, // Offset for header
-            behavior: 'smooth'
-          });
-        }
-      }
+      const anchor = (e.target as HTMLElement).closest("a");
+      const targetId = anchor?.getAttribute("href");
+      if (!targetId?.startsWith("#") || targetId === "#") return;
+
+      const targetElement = document.querySelector(targetId);
+      if (!targetElement) return;
+
+      e.preventDefault();
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({
+        top: targetElement.getBoundingClientRect().top + window.scrollY - 80,
+        behavior: reduceMotion ? "auto" : "smooth",
+      });
     };
-    
-    document.addEventListener('click', handleAnchorClick);
-    
-    return () => {
-      document.removeEventListener('click', handleAnchorClick);
-    };
+
+    document.addEventListener("click", handleAnchorClick);
+    return () => document.removeEventListener("click", handleAnchorClick);
   }, []);
-  
+
   return (
-    <>
-      <Header />
+    <div className="kv-landing bg-kv-cream font-body text-kv-ink">
+      <Nav />
       <main>
         <Hero />
-        <Features />
-        <Roles />
+        <Programs />
+        <DailyRhythm />
+        <Founder />
         <Waitlist />
         <FAQ />
         <Contact />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

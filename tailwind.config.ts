@@ -10,7 +10,24 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontFamily: {
+        display: ["Fredoka", "ui-rounded", "system-ui", "sans-serif"],
+        body: ["Nunito", "system-ui", "sans-serif"],
+      },
       colors: {
+        kv: {
+          cream: "#FFF8EE",
+          sand: "#F7E9D7",
+          ink: "#2E2A3B",
+          inkSoft: "#5D5770",
+          coral: "#E8704F",
+          coralDark: "#C9573A",
+          sun: "#F6B93B",
+          sage: "#8DB596",
+          sageDark: "#5E8F6B",
+          sky: "#7EB6D9",
+          lilac: "#B9A7E0",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -79,10 +96,15 @@ export default {
             height: "0",
           },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0) rotate(var(--tw-rotate))" },
+          "50%": { transform: "translateY(-10px) rotate(var(--tw-rotate))" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        float: "float 6s ease-in-out infinite",
       },
     },
   },

@@ -127,9 +127,9 @@ export default function ContactForm() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="general">General Inquiry</SelectItem>
-                  <SelectItem value="support">Support</SelectItem>
-                  <SelectItem value="partnership">Partnership Opportunities</SelectItem>
+                  <SelectItem value="general">General question</SelectItem>
+                  <SelectItem value="enrollment">Enrollment &amp; tours</SelectItem>
+                  <SelectItem value="careers">Working at Kid-Venture</SelectItem>
                   <SelectItem value="feedback">Feedback</SelectItem>
                 </SelectContent>
               </Select>
