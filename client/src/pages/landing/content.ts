@@ -65,13 +65,13 @@ export const dailyRhythm = [
 ];
 
 export const founderNote = {
-  title: "Hi, I'm so glad you're here",
+  title: "Hi, I'm Sarah",
   paragraphs: [
     "I'm a mom of two and I have a bachelor's degree in childhood education. Before staying home with my own kids, I managed a daycare and led a team of six caregivers. I loved helping children grow, and I loved helping parents feel at ease.",
     "Now I'm opening my home in the Lehi / American Fork area to a few more children. My goal is simple: to give your child the same care, structure and fun learning I give my own kids, in a setting that feels like family.",
     "Because the group is small, spots are limited. Tell me a little about your family below and I'll reach out personally.",
   ],
-  signature: "— [Your name], founder of Kid-Venture",
+  signature: "— Sarah, founder of Kid-Venture",
 };
 
 export const faqs = [
