@@ -31,8 +31,8 @@ static site.
 
 1. **Form key:** go to [web3forms.com](https://web3forms.com), sign in with the email address that
    should receive form submissions and create a form. Copy its **Access Key**.
-2. **Add the key:** repo **Settings → Secrets and variables → Actions → Variables → New repository variable**,
-   name `WEB3FORMS_KEY`, value = the key. (The key is public by design; it only allows sending to that inbox.)
+2. **Add the key:** it's set in `client/src/lib/submit-form.ts` (Web3Forms keys are public by design; they only
+   allow sending to that inbox). A `WEB3FORMS_KEY` repository variable or secret overrides it.
 3. **Turn on Pages:** repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 4. **Publish:** merge into `main` (or run the workflow from the **Actions** tab).
 5. **Custom domain:** **Settings → Pages → Custom domain** = `kid-venture.com`, save, then tick **Enforce HTTPS**

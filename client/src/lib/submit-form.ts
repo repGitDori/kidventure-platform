@@ -5,7 +5,10 @@ import type { InquiryInput } from "@shared/inquiry";
 // so submissions go to Web3Forms (https://web3forms.com), which emails them to
 // the address the access key was created for. Otherwise they go to our API.
 
-const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY as string | undefined;
+// Web3Forms access keys are public by design: they can only deliver to the
+// inbox they were created for. VITE_WEB3FORMS_KEY overrides this if set.
+const WEB3FORMS_KEY =
+  (import.meta.env.VITE_WEB3FORMS_KEY as string | undefined) || "e9f2cd9f-af7a-4f71-a482-2f9bc3e01cc0";
 export const isStaticSite = import.meta.env.VITE_STATIC_SITE === "true";
 
 async function sendToWeb3Forms(email: { subject: string; rows: EmailRows }, replyTo: string, name: string) {

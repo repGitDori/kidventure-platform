@@ -37,7 +37,7 @@ jobs:
         run: |
           if [ -n "$KEY_VAR" ]; then echo "Form key found (repository variable)"
           elif [ -n "$KEY_SECRET" ]; then echo "Form key found (repository secret)"
-          else echo "::warning::WEB3FORMS_KEY is not set, so the website forms can't send emails. Add it under Settings > Secrets and variables > Actions."
+          else echo "Using the form key built into client/src/lib/submit-form.ts"
           fi
 
       - name: Build static site
