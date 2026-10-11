@@ -29,8 +29,8 @@ through [Web3Forms](https://web3forms.com), which emails each submission
 (reply-to is the parent's address). The admin pages and logins are not part of the
 static site.
 
-1. **Form key:** go to [web3forms.com](https://web3forms.com), enter `databasemaestro@gmail.com`
-   and click *Create Access Key*. The key arrives by email.
+1. **Form key:** go to [web3forms.com](https://web3forms.com), sign in with the email address that
+   should receive form submissions and create a form. Copy its **Access Key**.
 2. **Add the key:** repo **Settings → Secrets and variables → Actions → Variables → New repository variable**,
    name `WEB3FORMS_KEY`, value = the key. (The key is public by design; it only allows sending to that inbox.)
 3. **Turn on Pages:** repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
@@ -66,7 +66,7 @@ Set these environment variables on your host:
 | `SESSION_SECRET` | **Yes** | Any long random string. |
 | `DATA_DIR` | Recommended | Folder on a persistent disk where form submissions are saved (default `./data`). |
 | `RESEND_API_KEY` | **Yes** | [Resend](https://resend.com) API key, used to email every form submission. |
-| `NOTIFY_EMAIL` | Optional | Where submissions are emailed (default `databasemaestro@gmail.com`; comma-separate for several). |
+| `NOTIFY_EMAIL` | **Yes** | Where submissions are emailed (comma-separate for several). |
 | `NOTIFY_FROM` | After DNS | `Kid-Venture <forms@kid-venture.com>` once the domain is verified in Resend (see below). |
 | `PORT` | Optional | Port to listen on (default `5000`). |
 
@@ -79,7 +79,7 @@ Every "Request a spot" and contact submission is emailed to `NOTIFY_EMAIL`, with
 reply-to set to the parent so you can just hit **Reply**.
 
 1. Create a free account at [resend.com](https://resend.com), create an API key and set `RESEND_API_KEY`.
-   If you sign up with `databasemaestro@gmail.com`, alerts work right away using Resend's test sender.
+   If you sign up with the same address as `NOTIFY_EMAIL`, alerts work right away using Resend's test sender.
 2. In Resend go to **Domains → Add domain → `kid-venture.com`**. Resend shows the exact records to add.
    They look like this (copy the real values from Resend, especially the DKIM key):
 
