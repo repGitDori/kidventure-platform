@@ -13,6 +13,20 @@ import {
   insertProfileChangeRequestSchema, loginSchema, Role
 } from "@shared/schema";
 import { z } from "zod";
+import { inquirySchema } from "@shared/inquiry";
+import { formStore } from "./form-store";
+import { notifyNewContactMessage, notifyNewInquiry } from "./notify";
+
+// Basic per-IP limit for the public forms to slow down spam bots.
+const formSubmissions = new Map<string, number[]>();
+function tooManySubmissions(req: Request) {
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
+  const hourAgo = Date.now() - 60 * 60 * 1000;
+  const recent = (formSubmissions.get(ip) || []).filter((t) => t > hourAgo);
+  recent.push(Date.now());
+  formSubmissions.set(ip, recent);
+  return recent.length > 10;
+}
 
 const SessionStore = MemoryStore(session);
 
@@ -629,14 +643,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
       }
       
-      const message = await storage.createContactMessage(result.data);
-      res.status(201).json(message);
+      if (tooManySubmissions(req)) {
+        return res.status(429).json({ message: 'Too many submissions, please try again later.' });
+      }
+
+      const message = await formStore.addContactMessage(result.data);
+      void notifyNewContactMessage(message);
+      res.status(201).json({ id: message.id });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Enrollment inquiry route
+  app.post('/api/inquiries', async (req, res, next) => {
+    try {
+      const result = inquirySchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: 'Invalid input', errors: result.error.format() });
+      }
+      // Honeypot filled in: pretend it worked so bots don't retry.
+      if (result.data.website) {
+        return res.status(201).json({ ok: true });
+      }
+      if (tooManySubmissions(req)) {
+        return res.status(429).json({ message: 'Too many submissions, please try again later.' });
+      }
+
+      const inquiry = await formStore.addInquiry(result.data);
+      void notifyNewInquiry(inquiry);
+      res.status(201).json({ ok: true, id: inquiry.id });
     } catch (error) {
       next(error);
     }
   });
 
   // Admin routes
+  app.get('/api/admin/inquiries', hasRole([Role.ADMIN]), (_req, res) => {
+    res.json(formStore.getInquiries());
+  });
+
+  app.patch('/api/admin/inquiries/:id', hasRole([Role.ADMIN]), async (req, res, next) => {
+    try {
+      const { status } = z
+        .object({ status: z.enum(['new', 'contacted', 'toured', 'enrolled', 'closed']) })
+        .parse(req.body);
+      const inquiry = await formStore.updateInquiryStatus(Number(req.params.id), status);
+      if (!inquiry) {
+        return res.status(404).json({ message: 'Inquiry not found' });
+      }
+      res.json(inquiry);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid status' });
+      }
+      next(error);
+    }
+  });
+
   app.get('/api/admin/waitlist', hasRole([Role.ADMIN]), async (_req, res, next) => {
     try {
       const entries = await storage.getWaitlistEntries();
@@ -648,7 +712,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/admin/messages', hasRole([Role.ADMIN]), async (_req, res, next) => {
     try {
-      const messages = await storage.getContactMessages();
+      const messages = formStore.getContactMessages();
       res.json(messages);
     } catch (error) {
       next(error);
@@ -657,7 +721,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/admin/messages/:id/read', hasRole([Role.ADMIN]), async (req, res, next) => {
     try {
-      const message = await storage.markContactMessageAsRead(Number(req.params.id));
+      const message = await formStore.markContactMessageAsRead(Number(req.params.id));
       if (!message) {
         return res.status(404).json({ message: 'Message not found' });
       }

@@ -43,7 +43,6 @@ export default function WaitlistForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const [deviceInfo, setDeviceInfo] = useState<Record<string, any>>({});
-  const [locationInfo, setLocationInfo] = useState<Record<string, any>>({});
   
   const form = useForm<WaitlistFormData>({
     resolver: zodResolver(waitlistSchema),
@@ -95,25 +94,6 @@ export default function WaitlistForm() {
     } else {
       setDeviceInfo(info);
     }
-    
-    // Try to get location information if permitted
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocationInfo({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-            timestamp: position.timestamp
-          });
-        },
-        () => {
-          // Silently handle error - don't want to prompt the user if they decline
-          setLocationInfo({ error: "Geolocation permission denied or unavailable" });
-        },
-        { timeout: 10000, maximumAge: 60000 }
-      );
-    }
   }, []);
   
   const onSubmit = async (data: WaitlistFormData) => {
@@ -124,7 +104,6 @@ export default function WaitlistForm() {
       const enrichedData: WaitlistFormData = {
         ...data,
         deviceInfo,
-        locationInfo,
         userAgent: navigator.userAgent,
         referrer: document.referrer || window.location.href,
       };
@@ -132,7 +111,7 @@ export default function WaitlistForm() {
       await apiRequest('POST', '/api/waitlist', enrichedData);
       
       toast({
-        title: "Thanks for joining our waitlist!",
+        title: "Thanks for joining our interest list!",
         description: "We'll be in touch soon with more information.",
       });
       
@@ -142,7 +121,7 @@ export default function WaitlistForm() {
       
       toast({
         title: "Submission failed",
-        description: "There was a problem adding you to the waitlist. Please try again.",
+        description: "There was a problem adding you to the interest list. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -151,10 +130,10 @@ export default function WaitlistForm() {
   };
   
   const interestOptions = [
-    { id: "learning", label: "Educational Resources" },
-    { id: "classes", label: "Classes & Activities" },
-    { id: "tracking", label: "Progress Tracking" },
-    { id: "community", label: "Community Features" },
+    { id: "infant", label: "Little Sprouts (6 wks – 12 mo)" },
+    { id: "toddler", label: "Busy Explorers (1 – 2 yrs)" },
+    { id: "preschool", label: "Curious Minds (3 – 5 yrs)" },
+    { id: "tour", label: "Booking a tour" },
   ];
   
   return (
@@ -235,8 +214,8 @@ export default function WaitlistForm() {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="parent">Parent</SelectItem>
-                  <SelectItem value="teacher">Teacher/Educator</SelectItem>
-                  <SelectItem value="school">School Administrator</SelectItem>
+                  <SelectItem value="expecting">Expecting parent</SelectItem>
+                  <SelectItem value="teacher">Teacher looking to join</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
@@ -308,7 +287,7 @@ export default function WaitlistForm() {
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel className="font-normal">
-                  I'd like to receive updates about KidVenture's launch and educational resources.
+                  Send me updates about Kid-Venture's opening, tours and enrollment.
                 </FormLabel>
               </div>
             </FormItem>
@@ -320,7 +299,7 @@ export default function WaitlistForm() {
           className="w-full"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Processing..." : "Join the Waitlist"}
+          {isSubmitting ? "Processing..." : "Join the interest list"}
         </Button>
         
         <p className="text-center text-xs text-gray-500 mt-3">

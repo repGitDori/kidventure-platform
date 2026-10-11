@@ -135,7 +135,8 @@ export class MemStorage implements IStorage {
     this.createUser({
       username: 'dorian',
       email: 'dorian@kidventure.com',
-      password: bcrypt.hashSync('cangetin', 10),
+      // Set ADMIN_PASSWORD on your host so the live site doesn't use the default
+      password: bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'cangetin', 10),
       firstName: 'Dorian',
       lastName: 'Admin',
       role: Role.ADMIN

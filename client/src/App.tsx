@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -24,7 +24,9 @@ import ProfilePage from "@/pages/profile";
 import ChildrenPage from "@/pages/children";
 import UsersPage from "@/pages/users";
 import AdminWaitlistPage from "@/pages/admin/waitlist";
+import AdminInquiriesPage from "@/pages/admin/inquiries";
 import { useEffect, useState, createContext } from "react";
+import { isStaticSite } from "@/lib/submit-form";
 
 export const UserContext = createContext<{
   user: any;
@@ -60,6 +62,7 @@ function Router() {
       <Route path="/children" component={ChildrenPage} />
       <Route path="/users" component={UsersPage} />
       <Route path="/admin/waitlist" component={AdminWaitlistPage} />
+      <Route path="/admin/inquiries" component={AdminInquiriesPage} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -73,6 +76,8 @@ function AppContent() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['/api/auth/me'],
     retry: false,
+    // The GitHub Pages site has no server to log in to
+    enabled: !isStaticSite,
     // Return null on 401 responses
     queryFn: async ({ queryKey }) => {
       try {
@@ -97,7 +102,9 @@ function AppContent() {
   });
   
   useEffect(() => {
-    if (!isLoading) {
+    if (isStaticSite) {
+      setCheckingAuth(false);
+    } else if (!isLoading) {
       setCheckingAuth(false);
       if (!isError) {
         setUser(data);
@@ -116,7 +123,10 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppContent />
+      {/* BASE_URL is "/" normally, or "/repo-name/" on a GitHub Pages project URL */}
+      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <AppContent />
+      </WouterRouter>
     </QueryClientProvider>
   );
 }

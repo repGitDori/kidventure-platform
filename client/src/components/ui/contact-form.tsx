@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest } from "@/lib/queryClient";
+import { sendContactMessage } from "@/lib/submit-form";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,7 +49,7 @@ export default function ContactForm() {
     setIsSubmitting(true);
     
     try {
-      await apiRequest('POST', '/api/contact', data);
+      await sendContactMessage(data);
       
       toast({
         title: "Message sent successfully!",
@@ -127,9 +127,9 @@ export default function ContactForm() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="general">General Inquiry</SelectItem>
-                  <SelectItem value="support">Support</SelectItem>
-                  <SelectItem value="partnership">Partnership Opportunities</SelectItem>
+                  <SelectItem value="general">General question</SelectItem>
+                  <SelectItem value="enrollment">Enrollment &amp; tours</SelectItem>
+                  <SelectItem value="careers">Working at Kid-Venture</SelectItem>
                   <SelectItem value="feedback">Feedback</SelectItem>
                 </SelectContent>
               </Select>

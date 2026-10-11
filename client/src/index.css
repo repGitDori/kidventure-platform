@@ -11,3 +11,21 @@
     @apply font-sans antialiased bg-background text-foreground pt-20;
   }
 }
+/* Re-theme the shared form components (buttons, inputs, checkboxes) on the landing page */
+.kv-landing {
+  --primary: 14 77% 61%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 14 77% 61%;
+  --background: 0 0% 100%;
+  --input: 33 60% 85%;
+  --border: 33 60% 88%;
+  --radius: 1rem;
+}
+
+@layer utilities {
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float {
+      animation: none;
+    }
+  }
+}
