@@ -6,8 +6,8 @@ export const site = {
   tagline: "Play. Explore. Grow.",
   area: "Lehi & American Fork",
   region: "Utah County, Utah",
-  email: "hello@kid-venture.com",
-  phone: "[(801) 555-1234]",
+  phone: "(209) 247-5653",
+  phoneHref: "tel:+12092475653",
   // For privacy, the home address is only shared with families after they get in touch.
   address: "In-home daycare serving Lehi & American Fork — address shared when we schedule your visit",
   hours: "Monday – Friday, [7:30 am – 5:30 pm]",

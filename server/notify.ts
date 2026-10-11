@@ -6,17 +6,17 @@ import { log } from "./vite";
 // Email alerts for every form submission, sent through Resend
 // (https://resend.com, free tier is plenty). Environment variables:
 //   RESEND_API_KEY  - API key from Resend (required for emails to send)
-//   NOTIFY_EMAIL    - where alerts go (default: databasemaestro@gmail.com)
+//   NOTIFY_EMAIL    - where alerts go (required; comma-separate for several)
 //   NOTIFY_FROM     - sender; set to "Kid-Venture <forms@kid-venture.com>" once
 //                     kid-venture.com is verified in Resend. Until then Resend's
 //                     test sender only delivers to the Resend account's own email.
 // Submissions are always saved and visible in the admin pages either way.
 
-const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL || "databasemaestro@gmail.com";
+const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL || "";
 const NOTIFY_FROM = process.env.NOTIFY_FROM || "Kid-Venture <onboarding@resend.dev>";
 
-if (!process.env.RESEND_API_KEY) {
-  log("RESEND_API_KEY is not set: form submissions will be saved but not emailed");
+if (!process.env.RESEND_API_KEY || !NOTIFY_EMAIL) {
+  log("RESEND_API_KEY or NOTIFY_EMAIL is not set: form submissions will be saved but not emailed");
 }
 
 const escape = (s: string) =>
@@ -24,7 +24,7 @@ const escape = (s: string) =>
 
 async function send({ subject, rows }: { subject: string; rows: EmailRows }, replyTo: string) {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return;
+  if (!apiKey || !NOTIFY_EMAIL) return;
 
   const html = `<table cellpadding="6" style="font-family:sans-serif;font-size:14px">${rows
     .filter(([, v]) => v)

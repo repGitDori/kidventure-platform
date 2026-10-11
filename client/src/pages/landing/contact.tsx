@@ -1,11 +1,10 @@
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, MapPin, Phone } from "lucide-react";
 import ContactForm from "@/components/ui/contact-form";
 import { site } from "./content";
 import { Wave } from "./doodles";
 
 const details = [
-  { icon: Mail, label: "Email", value: site.email, href: `mailto:${site.email}` },
-  { icon: Phone, label: "Phone", value: site.phone },
+  { icon: Phone, label: "Call or text", value: site.phone, href: site.phoneHref },
   { icon: MapPin, label: "Location", value: site.address },
   { icon: Clock, label: "Hours", value: site.hours },
 ];
