@@ -31,15 +31,22 @@ jobs:
       - run: npm ci
 
       - name: Check form key
-        if: ${{ vars.WEB3FORMS_KEY == '' }}
-        run: echo "::warning::WEB3FORMS_KEY is not set, so the website forms can't send emails. Add it under Settings > Secrets and variables > Actions > Variables."
+        env:
+          KEY_VAR: ${{ vars.WEB3FORMS_KEY }}
+          KEY_SECRET: ${{ secrets.WEB3FORMS_KEY }}
+        run: |
+          if [ -n "$KEY_VAR" ]; then echo "Form key found (repository variable)"
+          elif [ -n "$KEY_SECRET" ]; then echo "Form key found (repository secret)"
+          else echo "::warning::WEB3FORMS_KEY is not set, so the website forms can't send emails. Add it under Settings > Secrets and variables > Actions."
+          fi
 
       - name: Build static site
         run: npx vite build
         env:
           NODE_ENV: production
           VITE_STATIC_SITE: "true"
-          VITE_WEB3FORMS_KEY: ${{ vars.WEB3FORMS_KEY }}
+          # Accept the key saved either as a variable or as a secret
+          VITE_WEB3FORMS_KEY: ${{ vars.WEB3FORMS_KEY || secrets.WEB3FORMS_KEY }}
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
 
       # Serve the app for unknown paths too, so direct links still load
