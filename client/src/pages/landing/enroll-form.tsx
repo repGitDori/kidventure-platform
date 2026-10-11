@@ -13,6 +13,7 @@ import {
   type InquiryInput,
 } from "@shared/inquiry";
 import { sendInquiry } from "@/lib/submit-form";
+import { site } from "./content";
 
 const inputClass =
   "w-full rounded-2xl border-2 border-kv-sand bg-white px-4 py-3 font-body text-base text-kv-ink placeholder:text-kv-inkSoft/50 outline-none transition focus:border-kv-coral focus:ring-4 focus:ring-kv-coral/15";
@@ -313,7 +314,7 @@ export default function EnrollForm() {
 
       {status === "error" && (
         <p role="alert" className="rounded-2xl bg-[#FBE3DA] p-4 font-body font-semibold text-kv-coralDark">
-          Sorry, we couldn't send your request ({errorMessage}). Please try again, or email us directly.
+          Sorry, we couldn't send your request ({errorMessage}). Please try again, or call or text us at {site.phone}.
         </p>
       )}
       {Object.keys(errors).length > 0 && (
